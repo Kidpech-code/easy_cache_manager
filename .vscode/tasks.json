@@ -1,0 +1,114 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "run flutter tests",
+			"type": "shell",
+			"command": "flutter",
+			"args": [
+				"test"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$dart"
+			],
+			"group": "build"
+		},
+		{
+			"label": "run flutter tests",
+			"type": "shell",
+			"command": "flutter",
+			"args": [
+				"test"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$dart"
+			],
+			"group": "build"
+		},
+		{
+			"label": "run flutter tests",
+			"type": "shell",
+			"command": "flutter",
+			"args": [
+				"test",
+				"-r",
+				"expanded"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$dart"
+			],
+			"group": "build"
+		},
+		{
+			"label": "flutter analyze",
+			"type": "shell",
+			"command": "flutter",
+			"args": [
+				"analyze"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$dart"
+			],
+			"group": "build"
+		},
+		{
+			"label": "flutter analyze",
+			"type": "shell",
+			"command": "flutter",
+			"args": [
+				"analyze"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$dart"
+			],
+			"group": "build"
+		},
+		{
+			"label": "run tests (quick)",
+			"type": "shell",
+			"command": "flutter",
+			"args": [
+				"test",
+				"test/benchmarks/cache_benchmark_smoke_test.dart"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$dart"
+			],
+			"group": "build"
+		},
+		{
+			"label": "run tests (smoke benchmark)",
+			"type": "shell",
+			"command": "flutter",
+			"args": [
+				"test",
+				"test/benchmarks/cache_benchmark_smoke_test.dart"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$dart"
+			],
+			"group": "build"
+		},
+		{
+			"label": "run tests (smoke benchmark fixed)",
+			"type": "shell",
+			"command": "flutter",
+			"args": [
+				"test",
+				"test/benchmarks/cache_benchmark_smoke_test.dart"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$dart"
+			],
+			"group": "build"
+		}
+	]
+}

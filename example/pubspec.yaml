@@ -1,0 +1,77 @@
+name: easy_cache_manager_example
+description: "🚀 Comprehensive examples showcasing Easy Cache Manager features - From simple API caching to enterprise-level scenarios with compression, encryption & custom policies"
+
+publish_to: "none" # This is an example app, not published
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.19.0 <4.0.0"
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Use local package for development
+  easy_cache_manager:
+    path: ../
+
+  # UI and Navigation
+  cupertino_icons: ^1.0.6
+  material_color_utilities: ^0.11.1
+
+  # State Management
+  provider: ^6.1.1
+  flutter_riverpod: ^2.4.9
+
+  # Navigation
+  go_router: ^12.1.3
+
+  # Networking
+  http: ^1.1.2
+  dio: ^5.3.4
+
+  # JSON and Serialization
+  json_annotation: ^4.8.1
+
+  # Utilities
+  logger: ^2.0.2
+  intl: ^0.18.1
+  shared_preferences: ^2.2.2
+
+  # Image handling
+  cached_network_image: ^3.3.0
+  image_picker: ^1.0.4
+
+  # File handling
+  file_picker: ^6.1.1
+
+  # Charts and Visualization
+  fl_chart: ^0.65.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  build_runner: ^2.4.7
+  json_serializable: ^6.7.1
+  integration_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  # Example app assets
+  assets:
+    - assets/images/
+    - assets/data/
+    - assets/icons/
+
+  # Custom fonts for better UI
+  fonts:
+    - family: SourceCodePro
+      fonts:
+        - asset: assets/fonts/SourceCodePro-Regular.ttf
+        - asset: assets/fonts/SourceCodePro-Bold.ttf
+          weight: 700

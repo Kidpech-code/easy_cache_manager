@@ -1,0 +1,11 @@
+targets:
+  $default:
+    builders:
+      hive_generator|hive_builder:
+        generate_for:
+          include:
+            - lib/src/data/models/*.dart
+      json_serializable|json_serializable:
+        generate_for:
+          include:
+            - lib/src/data/models/*.dart
