@@ -614,7 +614,7 @@ final newsCache = EasyCacheManager.template(AppType.news);
 
 ```yaml
 dependencies:
-  easy_cache_manager: ^1.2.0
+  easy_cache_manager: ^0.1.0
 ```
 
 ### 2. การใช้งานพื้นฐาน (Minimal Configuration)
@@ -679,7 +679,7 @@ cacheManager.statsStream.listen((stats) {
 เพิ่มใน `pubspec.yaml`:
 ```yaml
 dependencies:
-  easy_cache_manager: ^1.2.0
+  easy_cache_manager: ^0.1.0
 ```
 
 ### 2. รันคำสั่ง
@@ -688,7 +688,7 @@ flutter pub get
 ```
 
 ### 3. เริ่มใช้งาน
-ดูตัวอย่างใน README.md หรือ docs/README.th.md
+ดูตัวอย่างใน README.md หรือ doc/README.th.md
 
 ## 🧹 Lint Best Practices
 - ใช้ `const` กับ Duration, String, List, Map ที่เป็นค่าคงที่

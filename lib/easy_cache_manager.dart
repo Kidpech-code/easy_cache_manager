@@ -1,6 +1,6 @@
 /// Easy Cache Manager - High-performance cache manager for Flutter
 ///
-/// v1.2.0 Performance upgrade: Now powered by Hive NoSQL for substantial speed improvements in many scenarios.
+/// v0.1.0 Performance upgrade: Now powered by Hive NoSQL for substantial speed improvements in many scenarios.
 ///
 /// This library aims to provide a fast Flutter caching solution with features:
 ///

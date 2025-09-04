@@ -1,4 +1,4 @@
-/// Easy Cache Manager v1.2.0 - Hive-backed storage
+/// Easy Cache Manager v0.1.0 - Hive-backed storage
 ///
 /// Notes:
 /// - Often faster than SQL-based approaches depending on workload

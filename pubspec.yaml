@@ -1,13 +1,13 @@
 name: easy_cache_manager
-description: "High-performance Flutter caching with Hive NoSQL"
-version: 0.0.1
-homepage: https://github.com/kidpech/easy_cache_manager
-repository: https://github.com/kidpech/easy_cache_manager
-issue_tracker: https://github.com/kidpech/easy_cache_manager/issues
+description: "High-performance Flutter cache with Hive & DDD."
+version: 0.1.0
+homepage: https://github.com/Kidpech-code/easy_cache_manager
+repository: https://github.com/Kidpech-code/easy_cache_manager
+issue_tracker: https://github.com/Kidpech-code/easy_cache_manager/issues
 documentation: https://pub.dev/packages/easy_cache_manager
 
 funding:
-  - https://github.com/sponsors/kidpech
+  - https://github.com/sponsors/Kidpech-code
 
 topics:
   - cache
@@ -16,9 +16,17 @@ topics:
   - offline
   - network
 
+platforms:
+  android:
+  ios:
+  linux:
+  macos:
+  web:
+  windows:
+
 environment:
-  sdk: ">=2.19.0 <4.0.0"
-  flutter: ">=3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.13.0"
 
 dependencies:
   flutter:

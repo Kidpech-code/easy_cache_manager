@@ -384,7 +384,7 @@ class DashboardAnalytics implements CacheAnalytics {
   @override
   Map<String, dynamic> exportMetrics() => {
     'service': 'easy_cache_manager',
-    'version': '1.2.0',
+    'version': '0.1.0',
     'metrics': _collectMetrics(),
   };
 }
@@ -743,7 +743,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  easy_cache_manager: ^1.2.0
+  easy_cache_manager: ^0.1.0
 ```
 
 ### 2. Basic Usage (Minimal Configuration)

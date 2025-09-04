@@ -1,8 +1,8 @@
 # 🚀 Easy Cache Manager - Complete Example Application
 
-[![Easy Cache Manager](https://img.shields.io/badge/Easy%20Cache%20Manager-v1.0.0-blue.svg)](https://pub.dev/packages/easy_cache_manager)
-[![Flutter](https://img.shields.io/badge/Flutter-3.0%2B-blue.svg)](https://flutter.dev)
-[![Dart](https://img.shields.io/badge/Dart-2.19%2B-blue.svg)](https://dart.dev)
+[![Easy Cache Manager](https://img.shields.io/badge/Easy%20Cache%20Manager-v0.1.0-blue.svg)](https://pub.dev/packages/easy_cache_manager)
+[![Flutter](https://img.shields.io/badge/Flutter-3.13%2B-blue.svg)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.0%2B-blue.svg)](https://dart.dev)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 > **สำหรับนักพัฒนาไทย**: นี่คือตัวอย่างครบถ้วนของ Easy Cache Manager ที่ออกแบบมาเพื่อประสิทธิภาพสูงสุด ใช้งานง่าย และยืดหยุ่นสำหรับทุกรูปแบบการใช้งาน
@@ -27,7 +27,7 @@ This comprehensive example application demonstrates **all features and capabilit
 ```bash
 # Add to your pubspec.yaml
 dependencies:
-  easy_cache_manager: ^1.0.0
+  easy_cache_manager: ^0.1.0
 
 # Install
 flutter pub get
@@ -368,19 +368,19 @@ open http://localhost:8080
 
 ### 📖 API Reference
 
-- **[Getting Started Guide](docs/getting-started.md)** - Basic setup and usage
-- **[Configuration Reference](docs/configuration.md)** - All configuration options
-- **[API Documentation](docs/api-reference.md)** - Complete method reference
-- **[Platform Guide](docs/platform-support.md)** - Platform-specific features
-- **[Performance Guide](docs/performance.md)** - Optimization tips
-- **[Migration Guide](docs/migration.md)** - Upgrading from other cache solutions
+- **[Getting Started Guide](doc/getting-started.md)** - Basic setup and usage
+- **[Configuration Reference](doc/configuration.md)** - All configuration options
+- **[API Documentation](doc/api-reference.md)** - Complete method reference
+- **[Platform Guide](doc/platform-support.md)** - Platform-specific features
+- **[Performance Guide](doc/performance.md)** - Optimization tips
+- **[Migration Guide](doc/migration.md)** - Upgrading from other cache solutions
 
 ### 🎯 Tutorials
 
-- **[Building an Offline-First App](docs/tutorials/offline-first.md)**
-- **[Implementing Image Caching](docs/tutorials/image-caching.md)**
-- **[Enterprise Security Setup](docs/tutorials/enterprise-security.md)**
-- **[Performance Optimization](docs/tutorials/performance-optimization.md)**
+- **[Building an Offline-First App](doc/tutorials/offline-first.md)**
+- **[Implementing Image Caching](doc/tutorials/image-caching.md)**
+- **[Enterprise Security Setup](doc/tutorials/enterprise-security.md)**
+- **[Performance Optimization](doc/tutorials/performance-optimization.md)**
 
 ## 🛟 Support & Community
 

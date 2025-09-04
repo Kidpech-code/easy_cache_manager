@@ -5,7 +5,7 @@ import 'hive_cache_storage.dart';
 
 /// Factory for creating platform-specific cache storage implementations
 ///
-/// **v1.2.0 PERFORMANCE REVOLUTION**: Now pure Hive-powered for maximum speed!
+/// **v0.1.0 PERFORMANCE REVOLUTION**: Now pure Hive-powered for maximum speed!
 ///
 /// Performance Results:
 /// - 🚀 10-50x faster than traditional SQL databases
@@ -73,29 +73,11 @@ class CacheStorageFactory {
   /// Gets platform-specific capabilities
   static Map<String, bool> _getCapabilities() {
     if (kIsWeb) {
-      return {
-        'persistent_storage': false,
-        'large_files': false,
-        'background_sync': false,
-        'compression': false,
-        'encryption': false
-      };
+      return {'persistent_storage': false, 'large_files': false, 'background_sync': false, 'compression': false, 'encryption': false};
     } else if (Platform.isAndroid || Platform.isIOS) {
-      return {
-        'persistent_storage': true,
-        'large_files': true,
-        'background_sync': true,
-        'compression': true,
-        'encryption': true
-      };
+      return {'persistent_storage': true, 'large_files': true, 'background_sync': true, 'compression': true, 'encryption': true};
     } else {
-      return {
-        'persistent_storage': true,
-        'large_files': true,
-        'background_sync': true,
-        'compression': true,
-        'encryption': true
-      };
+      return {'persistent_storage': true, 'large_files': true, 'background_sync': true, 'compression': true, 'encryption': true};
     }
   }
 
