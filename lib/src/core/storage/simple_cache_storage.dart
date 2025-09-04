@@ -9,6 +9,8 @@ import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:async';
+// Conditional import for Directory (native only)
+import 'dart:io' if (dart.library.html) 'dart:html';
 
 // This module uses path_provider conditionally for native platforms
 import 'web_path_provider.dart' // Web-compatible path provider
@@ -84,34 +86,40 @@ class SimpleCacheStorage implements SimpleCacheStorageInterface {
 
     try {
       // Initialize Hive if not already initialized
-      // For testing environment, we'll use in-memory storage
       if (!Hive.isBoxOpen(_boxName)) {
+        bool hiveInitialized = false;
+        // Try Flutter Hive initialization
         try {
-          // Try to initialize for Flutter first
           if (!Hive.isAdapterRegistered(0)) {
             await Hive.initFlutter();
+            hiveInitialized = true;
           }
-        } catch (e) {
-          // If Flutter initialization fails (like in testing), use regular Hive
-          // This is common in unit tests where Flutter bindings aren't available
+        } catch (_) {}
+        // Try path_provider temp directory
+        if (!hiveInitialized) {
           try {
             final tempDir = await path_provider.getTemporaryDirectory();
             final tempPath = tempDir.path;
             Hive.init(tempPath);
-          } catch (initError) {
-            // If both fail, we'll use in-memory storage
+            hiveInitialized = true;
+          } catch (_) {}
+        }
+        // Try Directory.systemTemp.path as last fallback
+        if (!hiveInitialized) {
+          try {
+            Hive.init(Directory.systemTemp.path);
+            hiveInitialized = true;
+          } catch (systemTempError) {
             if (kDebugMode) {
               debugPrint(
-                  'SimpleCacheStorage: fallback to in-memory (temp) failed: $initError');
+                  'SimpleCacheStorage: systemTemp fallback failed: $systemTempError');
             }
           }
         }
-
         _box = await Hive.openBox<dynamic>(_boxName);
       } else {
         _box = Hive.box<dynamic>(_boxName);
       }
-
       _initialized = true;
     } catch (e) {
       throw Exception('Failed to initialize SimpleCacheStorage: $e');
@@ -131,6 +139,15 @@ class SimpleCacheStorage implements SimpleCacheStorageInterface {
     _ensureInitialized();
     try {
       final jsonString = jsonEncode(data);
+      // If both fail, fallback to Directory.systemTemp.path (native only)
+      try {
+        Hive.init(Directory.systemTemp.path);
+      } catch (systemTempError) {
+        if (kDebugMode) {
+          debugPrint(
+              'SimpleCacheStorage: systemTemp fallback failed: $systemTempError');
+        }
+      }
       await _box!.put('json_$key', jsonString);
     } catch (e) {
       throw Exception('Failed to store JSON data for key "$key": $e');
