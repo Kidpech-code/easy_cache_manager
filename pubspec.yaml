@@ -33,33 +33,33 @@ dependencies:
     sdk: flutter
 
   # Core networking and HTTP client
-  http: ">=0.13.0 <2.0.0"
+  http: ^1.5.0
 
   # Cross-platform file system and path utilities
-  path_provider: ">=2.0.0 <3.0.0"
-  path: ">=1.8.0 <2.0.0"
+  path_provider: ^2.1.5
+  path: ^1.9.1
 
   # Universal IO for WASM compatibility
-  universal_io: ">=2.0.0 <3.0.0"
+  universal_io: ^2.2.2
 
   # Web support for WASM compatibility
-  web: ">=0.5.1 <2.0.0"
+  web: ^1.1.1
 
   # Cryptography for hashing and encryption
-  crypto: ">=3.0.0 <4.0.0"
+  crypto: ^3.0.6
 
   # Database support - High-performance NoSQL storage
   hive: ">=2.2.3 <4.0.0"
   hive_flutter: ">=1.1.0 <2.0.0"
 
   # Reactive programming streams
-  rxdart: ">=0.27.0 <1.0.0"
+  rxdart: ">=0.28.0 <1.0.0"
 
   # JSON serialization
-  json_annotation: ">=4.7.0 <5.0.0"
+  json_annotation: ^4.9.0
 
   # Logging utilities
-  logging: ">=1.1.0 <2.0.0"
+  logging: ^1.3.0
 
   # Image caching widget is provided via our own widget; remove direct dependency to keep core light
 
@@ -68,27 +68,27 @@ dev_dependencies:
     sdk: flutter
 
   # Linting and analysis
-  flutter_lints: ">=2.0.0 <4.0.0"
-  very_good_analysis: ">=4.0.0 <6.0.0"
+  flutter_lints: ^3.0.2
+  very_good_analysis: ^5.1.0
 
   # Testing utilities
-  mockito: ">=5.0.0 <6.0.0"
-  test: ">=1.21.0 <2.0.0"
+  mockito: ^5.4.5
+  test: ^1.25.15
   integration_test:
     sdk: flutter
 
   # Code generation for Hive models
-  build_runner: ">=2.3.0 <3.0.0"
-  json_serializable: ">=6.5.0 <7.0.0"
-  hive_generator: ">=2.0.0 <3.0.0"
+  build_runner: ^2.5.4
+  json_serializable: ^6.9.0
+  hive_generator: ^2.0.1
 
   # Performance testing
   flutter_driver:
     sdk: flutter
 
   # Competitor cache for fair comparisons (dev-only)
-  stash: ">=4.0.0 <6.0.0"
-  stash_memory: ">=4.0.0 <6.0.0"
+  stash: ^5.2.0
+  stash_memory: ^5.2.0
 
 # Configuration for the package analyzer
 analyzer:
