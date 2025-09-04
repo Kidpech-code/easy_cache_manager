@@ -27,7 +27,7 @@ This comprehensive example application demonstrates **all features and capabilit
 ```bash
 # Add to your pubspec.yaml
 dependencies:
-  easy_cache_manager: ^0.1.0
+  easy_cache_manager: ^0.1.2
 
 # Install
 flutter pub get
