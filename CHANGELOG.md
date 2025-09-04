@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.4] - 2024-12-04 🌐 WASM Compatibility & Network Enhancement
+
+### Fixed
+- **WASM Compatibility**: Resolved Web Assembly compatibility issues for Flutter Web
+- **Network Implementation**: Added conditional imports for network_info to support both native and web platforms
+- **Dart Formatting**: Fixed all dart format issues across the codebase
+- **Static Analysis**: Enhanced code quality and formatting compliance
+
+### Added
+- **Platform-Specific Network**: Separated network implementations for native (dart:io) and web (HTTP-based) platforms
+- **Conditional Imports**: Added smart conditional importing for better cross-platform support
+- **Web Compatibility**: Enhanced support for Flutter Web without dart:io dependencies
+
+### Technical
+- Created network_info_native.dart for mobile/desktop platforms using dart:io
+- Created network_info_web.dart for web platform using HTTP requests
+- Updated network_info.dart with conditional imports
+- Improved WASM compatibility for future Flutter Web updates
+- Enhanced code formatting across all files
+
 ## [0.1.3] - 2024-12-04 📦 Generated Files & Pub.dev Optimization
 
 ### Fixed

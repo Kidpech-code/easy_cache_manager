@@ -1,4 +1,13 @@
-# 🚀 Easy Cache Manager - Complete Example Application
+# 🚀 Easy Cache Manager ### 1. Installation
+
+```bash
+# Add to your pubspec.yaml
+dependencies:
+  easy_cache_manager: ^0.1.4
+
+# Install
+flutter pub get
+``` Example Application
 
 [![Easy Cache Manager](https://img.shields.io/badge/Easy%20Cache%20Manager-v0.1.0-blue.svg)](https://pub.dev/packages/easy_cache_manager)
 [![Flutter](https://img.shields.io/badge/Flutter-3.13%2B-blue.svg)](https://flutter.dev)
