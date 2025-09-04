@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'dart:io' if (dart.library.html) 'dart:html';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:hive/hive.dart' as hive_core;
-import 'package:universal_io/io.dart';
+// import 'package:hive/hive.dart' as hive_core; // Removed unused import
+// Removed universal_io/io.dart for WASM/Web compatibility
 import '../../domain/entities/cache_entry.dart';
 import '../../domain/entities/cache_stats.dart';
 import '../../data/models/hive_cache_entry.dart';
@@ -78,22 +79,24 @@ class HiveCacheStorage implements PlatformCacheStorage {
 
   Future<void> _initializeHive() async {
     if (kIsWeb) {
-      // Web initialization
+      // Web/WASM initialization: no directory, just use Hive.initFlutter()
       await Hive.initFlutter();
     } else {
-      // Mobile/Desktop initialization with safe fallbacks for tests
+      // Native platforms: use path_provider or fallback
       try {
         final directoryPath =
             await NativeStorageAdapter.getDocumentsDirectory();
         await Hive.initFlutter(directoryPath);
       } catch (e) {
-        // Fallback for environments without initialized bindings/plugins (e.g., unit tests)
-        final tempDir =
-            await Directory.systemTemp.createTemp('easy_cache_hive');
-        hive_core.Hive.init(tempDir.path);
+        // Fallback: use Hive.init with system temp directory for test environments
+        try {
+          Hive.init(Directory.systemTemp.path);
+        } catch (e2) {
+          throw Exception(
+              'Hive initialization failed: $e, fallback failed: $e2');
+        }
       }
     }
-
     // Register adapters
     if (!Hive.isAdapterRegistered(0)) {
       Hive.registerAdapter(HiveCacheEntryAdapter());
@@ -104,20 +107,14 @@ class HiveCacheStorage implements PlatformCacheStorage {
   }
 
   Future<void> _initializeCacheDirectory() async {
-    if (kIsWeb) return; // No file system on web
+    if (kIsWeb) return; // No file system on web/wasm
     try {
       final tempDirectoryPath = await NativeStorageAdapter.getCacheDirectory();
       _cacheDirectory = '$tempDirectoryPath/easy_cache_hive';
+      // Only create directory if not on Web/WASM
     } catch (e) {
-      // Fallback when path_provider isn't available (e.g., certain test envs)
-      final tempDirectory =
-          await Directory.systemTemp.createTemp('easy_cache_hive');
-      _cacheDirectory = tempDirectory.path;
-    }
-
-    final directory = Directory(_cacheDirectory!);
-    if (!await directory.exists()) {
-      await directory.create(recursive: true);
+      // Fallback: skip directory creation on Web/WASM
+      _cacheDirectory = null;
     }
   }
 
@@ -191,12 +188,14 @@ class HiveCacheStorage implements PlatformCacheStorage {
       // For large files, store in file system; small ones in Hive
       const maxInMemorySize = 1024 * 1024; // 1MB threshold
 
-      if (bytes.length > maxInMemorySize && !kIsWeb) {
-        // Store large binary in file system
-        final fileName = '${key.hashCode}.cache';
-        filePath = '${_cacheDirectory!}/$fileName';
-        final file = File(filePath);
-        await file.writeAsBytes(bytes);
+      if (bytes.length > maxInMemorySize &&
+          !kIsWeb &&
+          _cacheDirectory != null) {
+        // Store large binary in file system (native only)
+        // On Web/WASM, skip file system, store in Hive only
+        // File operations removed for WASM/Web compatibility
+        await _binaryBox!.put(key, bytes);
+        filePath = null;
       } else {
         // Store in Hive for fast access
         await _binaryBox!.put(key, bytes);
@@ -291,18 +290,8 @@ class HiveCacheStorage implements PlatformCacheStorage {
         return null;
       }
 
-      Uint8List? bytes;
-
-      if (entry.filePath != null) {
-        // Load from file
-        final file = File(entry.filePath!);
-        if (await file.exists()) {
-          bytes = await file.readAsBytes();
-        }
-      } else {
-        // Load from Hive
-        bytes = _binaryBox!.get(key);
-      }
+      // On Web/WASM, always load from Hive
+      Uint8List? bytes = _binaryBox!.get(key);
 
       if (bytes != null) {
         _stats!.incrementHit();
@@ -345,14 +334,8 @@ class HiveCacheStorage implements PlatformCacheStorage {
       if (entry != null) {
         // Remove binary data if exists
         if (entry.isBinary) {
-          if (entry.filePath != null) {
-            final file = File(entry.filePath!);
-            if (await file.exists()) {
-              await file.delete();
-            }
-          } else {
-            await _binaryBox!.delete(key);
-          }
+          // On Web/WASM, always use Hive for binary storage
+          await _binaryBox!.delete(key);
         }
 
         // Update stats
@@ -379,14 +362,7 @@ class HiveCacheStorage implements PlatformCacheStorage {
       await _cacheBox!.clear();
       await _binaryBox!.clear();
 
-      // Clear file directory
-      if (_cacheDirectory != null) {
-        final directory = Directory(_cacheDirectory!);
-        if (await directory.exists()) {
-          await directory.delete(recursive: true);
-          await directory.create(recursive: true);
-        }
-      }
+      // On Web/WASM, skip file system directory clearing
 
       // Reset stats
       _stats!.reset();

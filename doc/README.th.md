@@ -1,5 +1,6 @@
-
 # 🚀⚡ Easy Cache Manager - High-performance Flutter Caching (ภาษาไทย)
+
+**เวอร์ชัน: 0.1.7**
 
 [![pub package](https://img.shields.io/pub/v/easy_cache_manager.svg)](https://pub.dev/packages/easy_cache_manager)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kidpech/easy_cache_manager/blob/main/LICENSE)
@@ -614,7 +615,7 @@ final newsCache = EasyCacheManager.template(AppType.news);
 
 ```yaml
 dependencies:
-  easy_cache_manager: ^0.1.6
+  easy_cache_manager: ^0.1.7
 ```
 
 ### 2. การใช้งานพื้นฐาน (Minimal Configuration)
@@ -679,7 +680,7 @@ cacheManager.statsStream.listen((stats) {
 เพิ่มใน `pubspec.yaml`:
 ```yaml
 dependencies:
-  easy_cache_manager: ^0.1.6
+  easy_cache_manager: ^0.1.7
 ```
 
 ### 2. รันคำสั่ง

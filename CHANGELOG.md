@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.7] - 2024-09-04 🛠️ Robust Test Environment Support & Hive Fallbacks
+
+### Fixed
+- **Test Environment Hive Fallbacks**: HiveCacheStorage and SimpleCacheStorage now robustly fallback to Directory.systemTemp for all test environments, ensuring all tests pass without path_provider or Flutter bindings.
+- **Benchmark Test Reliability**: Added TestWidgetsFlutterBinding.ensureInitialized() to benchmark tests for proper Flutter plugin initialization.
+- **Error Handling**: Improved error handling and fallback logic for Hive initialization across all platforms.
+
+### Technical
+- Refactored HiveCacheStorage and SimpleCacheStorage to use Hive.init(Directory.systemTemp.path) for test environments.
+- Updated benchmark test to initialize Flutter bindings for plugin compatibility.
+
 ## [0.1.6] - 2024-12-05 🔧 Improved Web/WASM Support
 
 ### Fixed
