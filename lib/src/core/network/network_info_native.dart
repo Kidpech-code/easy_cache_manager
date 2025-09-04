@@ -5,7 +5,8 @@ import 'network_info.dart';
 class NetworkInfoImpl implements NetworkInfo {
   final http.Client httpClient;
 
-  NetworkInfoImpl({http.Client? httpClient}) : httpClient = httpClient ?? http.Client();
+  NetworkInfoImpl({http.Client? httpClient})
+      : httpClient = httpClient ?? http.Client();
 
   @override
   Future<bool> get isConnected async {
