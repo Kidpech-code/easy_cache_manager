@@ -120,7 +120,8 @@ class EasyCacheManagerExampleApp extends StatelessWidget {
           children: [
             const Icon(Icons.error_outline, size: 48, color: Colors.red),
             const SizedBox(height: 16),
-            const Text('Oops! Something went wrong', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Oops! Something went wrong',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Text(
               details.exception.toString(),
@@ -128,7 +129,9 @@ class EasyCacheManagerExampleApp extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            ElevatedButton(onPressed: () => _restartApp(), child: const Text('Restart App')),
+            ElevatedButton(
+                onPressed: () => _restartApp(),
+                child: const Text('Restart App')),
           ],
         ),
       ),
@@ -148,36 +151,53 @@ final GoRouter _router = GoRouter(
     GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
 
     // Basic examples - Getting started scenarios
-    GoRoute(path: '/basic-examples', builder: (context, state) => const BasicExamplesScreen()),
+    GoRoute(
+        path: '/basic-examples',
+        builder: (context, state) => const BasicExamplesScreen()),
 
     // Advanced features - Enterprise-level capabilities
-    GoRoute(path: '/advanced-examples', builder: (context, state) => const AdvancedExamplesScreen()),
+    GoRoute(
+        path: '/advanced-examples',
+        builder: (context, state) => const AdvancedExamplesScreen()),
 
     // Performance demonstrations and benchmarks
-    GoRoute(path: '/performance-demo', builder: (context, state) => const PerformanceDemoScreen()),
+    GoRoute(
+        path: '/performance-demo',
+        builder: (context, state) => const PerformanceDemoScreen()),
 
     // Platform-specific features and capabilities
-    GoRoute(path: '/platform-demo', builder: (context, state) => const PlatformDemoScreen()),
+    GoRoute(
+        path: '/platform-demo',
+        builder: (context, state) => const PlatformDemoScreen()),
 
     // Custom enterprise scenarios
-    GoRoute(path: '/custom-scenarios', builder: (context, state) => const CustomScenariosScreen()),
+    GoRoute(
+        path: '/custom-scenarios',
+        builder: (context, state) => const CustomScenariosScreen()),
 
     // Real-time monitoring and debugging
-    GoRoute(path: '/monitoring', builder: (context, state) => const MonitoringScreen()),
+    GoRoute(
+        path: '/monitoring',
+        builder: (context, state) => const MonitoringScreen()),
   ],
 
   // Error handling for navigation
   errorBuilder: (context, state) => Scaffold(
-    appBar: AppBar(title: const Text('Page Not Found'), backgroundColor: Colors.red, foregroundColor: Colors.white),
+    appBar: AppBar(
+        title: const Text('Page Not Found'),
+        backgroundColor: Colors.red,
+        foregroundColor: Colors.white),
     body: Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Icon(Icons.error_outline, size: 64, color: Colors.red),
           const SizedBox(height: 16),
-          Text('Page not found: ${state.uri}', style: const TextStyle(fontSize: 18)),
+          Text('Page not found: ${state.uri}',
+              style: const TextStyle(fontSize: 18)),
           const SizedBox(height: 16),
-          ElevatedButton(onPressed: () => context.go('/'), child: const Text('Go Home')),
+          ElevatedButton(
+              onPressed: () => context.go('/'), child: const Text('Go Home')),
         ],
       ),
     ),
@@ -187,7 +207,8 @@ final GoRouter _router = GoRouter(
 /// Application constants and configuration
 class AppConstants {
   // Example API endpoints for demonstrations
-  static const String jsonPlaceholderApi = 'https://jsonplaceholder.typicode.com';
+  static const String jsonPlaceholderApi =
+      'https://jsonplaceholder.typicode.com';
   static const String picSumApi = 'https://picsum.photos';
   static const String httpBinApi = 'https://httpbin.org';
 
@@ -209,14 +230,21 @@ class AppConstants {
 /// Utility extensions for better code readability
 extension CacheConfigurationExtension on BuildContext {
   /// Get current cache provider
-  CacheProvider get cacheProvider => Provider.of<CacheProvider>(this, listen: false);
+  CacheProvider get cacheProvider =>
+      Provider.of<CacheProvider>(this, listen: false);
 
   /// Get current theme provider
-  ThemeProvider get themeProvider => Provider.of<ThemeProvider>(this, listen: false);
+  ThemeProvider get themeProvider =>
+      Provider.of<ThemeProvider>(this, listen: false);
 }
 
 /// Application-level error types
-enum ExampleError { networkError, cacheError, configurationError, platformError }
+enum ExampleError {
+  networkError,
+  cacheError,
+  configurationError,
+  platformError
+}
 
 class ExampleException implements Exception {
   final String message;

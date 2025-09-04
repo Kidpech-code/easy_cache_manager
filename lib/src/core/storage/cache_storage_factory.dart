@@ -73,11 +73,29 @@ class CacheStorageFactory {
   /// Gets platform-specific capabilities
   static Map<String, bool> _getCapabilities() {
     if (kIsWeb) {
-      return {'persistent_storage': false, 'large_files': false, 'background_sync': false, 'compression': false, 'encryption': false};
+      return {
+        'persistent_storage': false,
+        'large_files': false,
+        'background_sync': false,
+        'compression': false,
+        'encryption': false
+      };
     } else if (Platform.isAndroid || Platform.isIOS) {
-      return {'persistent_storage': true, 'large_files': true, 'background_sync': true, 'compression': true, 'encryption': true};
+      return {
+        'persistent_storage': true,
+        'large_files': true,
+        'background_sync': true,
+        'compression': true,
+        'encryption': true
+      };
     } else {
-      return {'persistent_storage': true, 'large_files': true, 'background_sync': true, 'compression': true, 'encryption': true};
+      return {
+        'persistent_storage': true,
+        'large_files': true,
+        'background_sync': true,
+        'compression': true,
+        'encryption': true
+      };
     }
   }
 

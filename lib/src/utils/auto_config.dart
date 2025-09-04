@@ -111,7 +111,8 @@ class EasyCacheManager {
     }
 
     // Auto-tune config based on workload
-    Duration stalePeriod = isHighTraffic ? const Duration(minutes: 15) : const Duration(hours: 1);
+    Duration stalePeriod =
+        isHighTraffic ? const Duration(minutes: 15) : const Duration(hours: 1);
     double cleanupThreshold = 0.8;
     bool enableLogging = importance == 'high';
 
@@ -183,7 +184,9 @@ class EasyCacheManager {
 
     return CacheConfig(
       maxCacheSize: maxSize,
-      stalePeriod: expectedUsers > 1000 ? const Duration(minutes: 10) : const Duration(hours: 2),
+      stalePeriod: expectedUsers > 1000
+          ? const Duration(minutes: 10)
+          : const Duration(hours: 2),
       enableOfflineMode: true,
       autoCleanup: true,
       cleanupThreshold: platform == 'mobile' ? 0.8 : 0.9,
@@ -318,7 +321,8 @@ class SimpleCacheManager {
   /// Get cache manager instance (throws if not initialized)
   static CacheManager get instance {
     if (_instance == null) {
-      throw StateError('SimpleCacheManager not initialized! Call SimpleCacheManager.init() first');
+      throw StateError(
+          'SimpleCacheManager not initialized! Call SimpleCacheManager.init() first');
     }
     return _instance!;
   }
@@ -326,7 +330,8 @@ class SimpleCacheManager {
   /// Get simple storage instance (throws if not initialized)
   static SimpleCacheStorage get _storage {
     if (_simpleStorage == null) {
-      throw StateError('SimpleCacheManager not initialized! Call SimpleCacheManager.init() first');
+      throw StateError(
+          'SimpleCacheManager not initialized! Call SimpleCacheManager.init() first');
     }
     return _simpleStorage!;
   }

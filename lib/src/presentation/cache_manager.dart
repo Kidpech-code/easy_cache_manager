@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'package:easy_cache_manager/src/core/network/network_info_web.dart';
 import 'package:rxdart/rxdart.dart';
 import '../domain/entities/cache_config.dart';
 import '../domain/entities/cache_stats.dart';
@@ -95,15 +96,24 @@ class CacheManager {
   /// Returns the latest [CacheStats] without creating a stream subscription.
   CacheStats get currentStats => _statsController.value;
 
-  CacheManager({required this.config, HiveCacheStorage? hiveCacheStorage, NetworkRemoteDataSource? remoteDataSource, NetworkInfo? networkInfo})
+  CacheManager(
+      {required this.config,
+      HiveCacheStorage? hiveCacheStorage,
+      NetworkRemoteDataSource? remoteDataSource,
+      NetworkInfo? networkInfo})
       : _statusController = BehaviorSubject<CacheStatusInfo>.seeded(
-          CacheStatusInfo(status: CacheStatus.loading, message: 'Initializing high-performance Hive cache...', timestamp: DateTime.now()),
+          CacheStatusInfo(
+              status: CacheStatus.loading,
+              message: 'Initializing high-performance Hive cache...',
+              timestamp: DateTime.now()),
         ),
-        _statsController = BehaviorSubject<CacheStats>.seeded(CacheStats.empty()) {
+        _statsController =
+            BehaviorSubject<CacheStats>.seeded(CacheStats.empty()) {
     _initialize(hiveCacheStorage, remoteDataSource, networkInfo);
   }
 
-  void _initialize(HiveCacheStorage? hiveCacheStorage, NetworkRemoteDataSource? remoteDataSource, NetworkInfo? networkInfo) {
+  void _initialize(HiveCacheStorage? hiveCacheStorage,
+      NetworkRemoteDataSource? remoteDataSource, NetworkInfo? networkInfo) {
     // Initialize dependencies with blazing-fast Hive storage
     final hiveStorage = hiveCacheStorage ?? HiveCacheStorage();
     final remoteDS = remoteDataSource ?? NetworkRemoteDataSourceImpl();
@@ -113,11 +123,20 @@ class CacheManager {
     final networkRepository = NetworkRepositoryImpl(remoteDataSource: remoteDS);
 
     // Initialize use cases
-    _getJsonUseCase = GetJsonUseCase(cacheRepository: cacheRepository, networkRepository: networkRepository, networkInfo: netInfo, config: config);
+    _getJsonUseCase = GetJsonUseCase(
+        cacheRepository: cacheRepository,
+        networkRepository: networkRepository,
+        networkInfo: netInfo,
+        config: config);
 
-    _getBytesUseCase = GetBytesUseCase(cacheRepository: cacheRepository, networkRepository: networkRepository, networkInfo: netInfo, config: config);
+    _getBytesUseCase = GetBytesUseCase(
+        cacheRepository: cacheRepository,
+        networkRepository: networkRepository,
+        networkInfo: netInfo,
+        config: config);
 
-    _cacheManagementUseCase = CacheManagementUseCase(cacheRepository: cacheRepository);
+    _cacheManagementUseCase =
+        CacheManagementUseCase(cacheRepository: cacheRepository);
 
     // Set up auto cleanup if enabled
     if (config.autoCleanup) {
@@ -127,59 +146,86 @@ class CacheManager {
     // Initialize stats
     _updateStats();
 
-    _statusController.add(CacheStatusInfo(status: CacheStatus.cached, message: 'Cache manager ready', timestamp: DateTime.now()));
+    _statusController.add(CacheStatusInfo(
+        status: CacheStatus.cached,
+        message: 'Cache manager ready',
+        timestamp: DateTime.now()));
   }
 
   /// Fetch JSON data with caching
-  Future<Map<String, dynamic>> getJson(String url, {Duration? maxAge, Map<String, String>? headers, bool forceRefresh = false}) async {
+  Future<Map<String, dynamic>> getJson(String url,
+      {Duration? maxAge,
+      Map<String, String>? headers,
+      bool forceRefresh = false}) async {
     _statusController.add(CacheStatusInfo.loading(key: url));
 
     try {
-      final result = await _getJsonUseCase.execute(url, maxAge: maxAge, headers: headers, forceRefresh: forceRefresh);
+      final result = await _getJsonUseCase.execute(url,
+          maxAge: maxAge, headers: headers, forceRefresh: forceRefresh);
 
       if (result.isSuccess) {
         final statusInfo = result.isFromCache
-            ? CacheStatusInfo.cached(key: url, loadTime: result.loadTime, sizeInBytes: result.data.toString().length)
-            : CacheStatusInfo.fresh(key: url, loadTime: result.loadTime, sizeInBytes: result.data.toString().length);
+            ? CacheStatusInfo.cached(
+                key: url,
+                loadTime: result.loadTime,
+                sizeInBytes: result.data.toString().length)
+            : CacheStatusInfo.fresh(
+                key: url,
+                loadTime: result.loadTime,
+                sizeInBytes: result.data.toString().length);
 
         _statusController.add(statusInfo);
         _updateStats();
 
         return result.data!;
       } else {
-        final errorInfo = CacheStatusInfo.error(message: result.failure?.message ?? 'Unknown error', key: url);
+        final errorInfo = CacheStatusInfo.error(
+            message: result.failure?.message ?? 'Unknown error', key: url);
         _statusController.add(errorInfo);
         throw Exception(result.failure?.message ?? 'Failed to get JSON');
       }
     } catch (e) {
-      _statusController.add(CacheStatusInfo.error(message: e.toString(), key: url));
+      _statusController
+          .add(CacheStatusInfo.error(message: e.toString(), key: url));
       rethrow;
     }
   }
 
   /// Fetch binary data with caching
-  Future<Uint8List> getBytes(String url, {Duration? maxAge, Map<String, String>? headers, bool forceRefresh = false}) async {
+  Future<Uint8List> getBytes(String url,
+      {Duration? maxAge,
+      Map<String, String>? headers,
+      bool forceRefresh = false}) async {
     _statusController.add(CacheStatusInfo.loading(key: url));
 
     try {
-      final result = await _getBytesUseCase.execute(url, maxAge: maxAge, headers: headers, forceRefresh: forceRefresh);
+      final result = await _getBytesUseCase.execute(url,
+          maxAge: maxAge, headers: headers, forceRefresh: forceRefresh);
 
       if (result.isSuccess) {
         final statusInfo = result.isFromCache
-            ? CacheStatusInfo.cached(key: url, loadTime: result.loadTime, sizeInBytes: result.data!.length)
-            : CacheStatusInfo.fresh(key: url, loadTime: result.loadTime, sizeInBytes: result.data!.length);
+            ? CacheStatusInfo.cached(
+                key: url,
+                loadTime: result.loadTime,
+                sizeInBytes: result.data!.length)
+            : CacheStatusInfo.fresh(
+                key: url,
+                loadTime: result.loadTime,
+                sizeInBytes: result.data!.length);
 
         _statusController.add(statusInfo);
         _updateStats();
 
         return result.data!;
       } else {
-        final errorInfo = CacheStatusInfo.error(message: result.failure?.message ?? 'Unknown error', key: url);
+        final errorInfo = CacheStatusInfo.error(
+            message: result.failure?.message ?? 'Unknown error', key: url);
         _statusController.add(errorInfo);
         throw Exception(result.failure?.message ?? 'Failed to get bytes');
       }
     } catch (e) {
-      _statusController.add(CacheStatusInfo.error(message: e.toString(), key: url));
+      _statusController
+          .add(CacheStatusInfo.error(message: e.toString(), key: url));
       rethrow;
     }
   }
@@ -190,9 +236,13 @@ class CacheManager {
       await _cacheManagementUseCase.clearCache();
       await _updateStats();
 
-      _statusController.add(CacheStatusInfo(status: CacheStatus.cached, message: 'Cache cleared successfully', timestamp: DateTime.now()));
+      _statusController.add(CacheStatusInfo(
+          status: CacheStatus.cached,
+          message: 'Cache cleared successfully',
+          timestamp: DateTime.now()));
     } catch (e) {
-      _statusController.add(CacheStatusInfo.error(message: 'Failed to clear cache: $e'));
+      _statusController
+          .add(CacheStatusInfo.error(message: 'Failed to clear cache: $e'));
       rethrow;
     }
   }
@@ -203,7 +253,8 @@ class CacheManager {
       await _cacheManagementUseCase.removeItem(key);
       await _updateStats();
     } catch (e) {
-      _statusController.add(CacheStatusInfo.error(message: 'Failed to remove cache item: $e', key: key));
+      _statusController.add(CacheStatusInfo.error(
+          message: 'Failed to remove cache item: $e', key: key));
       rethrow;
     }
   }
@@ -232,9 +283,13 @@ class CacheManager {
       await _cacheManagementUseCase.cleanup();
       await _updateStats();
 
-      _statusController.add(CacheStatusInfo(status: CacheStatus.cached, message: 'Cache cleanup completed', timestamp: DateTime.now()));
+      _statusController.add(CacheStatusInfo(
+          status: CacheStatus.cached,
+          message: 'Cache cleanup completed',
+          timestamp: DateTime.now()));
     } catch (e) {
-      _statusController.add(CacheStatusInfo.error(message: 'Failed to cleanup cache: $e'));
+      _statusController
+          .add(CacheStatusInfo.error(message: 'Failed to cleanup cache: $e'));
       rethrow;
     }
   }

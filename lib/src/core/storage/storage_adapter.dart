@@ -5,4 +5,5 @@
 /// - Native: Uses NativeStorageAdapter (path_provider) for file system access
 library;
 
-export 'web_storage_adapter.dart' if (dart.library.io) 'native_storage_adapter.dart';
+export 'web_storage_adapter.dart'
+    if (dart.library.io) 'native_storage_adapter.dart';
