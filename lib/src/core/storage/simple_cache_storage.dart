@@ -8,7 +8,12 @@ library simple_cache_storage;
 import 'dart:convert';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/foundation.dart';
-import 'package:path_provider/path_provider.dart';
+import 'dart:async';
+
+// This module uses path_provider conditionally for native platforms
+import 'web_path_provider.dart' // Web-compatible path provider
+    if (dart.library.io) 'package:path_provider/path_provider.dart' // Native path provider
+    as path_provider; // Unified import name
 
 /// Simple storage interface for key-value data
 abstract class SimpleCacheStorageInterface {
@@ -90,13 +95,13 @@ class SimpleCacheStorage implements SimpleCacheStorageInterface {
           // If Flutter initialization fails (like in testing), use regular Hive
           // This is common in unit tests where Flutter bindings aren't available
           try {
-            final tempDir = await getTemporaryDirectory();
-            Hive.init(tempDir.path);
+            final tempDir = await path_provider.getTemporaryDirectory();
+            final tempPath = tempDir.path;
+            Hive.init(tempPath);
           } catch (initError) {
             // If both fail, we'll use in-memory storage
             if (kDebugMode) {
-              debugPrint(
-                  'SimpleCacheStorage: fallback to in-memory (temp) failed: $initError');
+              debugPrint('SimpleCacheStorage: fallback to in-memory (temp) failed: $initError');
             }
           }
         }
@@ -115,8 +120,7 @@ class SimpleCacheStorage implements SimpleCacheStorageInterface {
   /// Ensure storage is initialized
   void _ensureInitialized() {
     if (!_initialized || _box == null) {
-      throw StateError(
-          'SimpleCacheStorage not initialized. Call init() first.');
+      throw StateError('SimpleCacheStorage not initialized. Call init() first.');
     }
   }
 
@@ -287,16 +291,11 @@ class SimpleCacheStorage implements SimpleCacheStorageInterface {
     _ensureInitialized();
     try {
       final keys = _box!.keys.length;
-      final jsonCount =
-          _box!.keys.where((k) => k.toString().startsWith('json_')).length;
-      final stringCount =
-          _box!.keys.where((k) => k.toString().startsWith('string_')).length;
-      final intCount =
-          _box!.keys.where((k) => k.toString().startsWith('int_')).length;
-      final boolCount =
-          _box!.keys.where((k) => k.toString().startsWith('bool_')).length;
-      final bytesCount =
-          _box!.keys.where((k) => k.toString().startsWith('bytes_')).length;
+      final jsonCount = _box!.keys.where((k) => k.toString().startsWith('json_')).length;
+      final stringCount = _box!.keys.where((k) => k.toString().startsWith('string_')).length;
+      final intCount = _box!.keys.where((k) => k.toString().startsWith('int_')).length;
+      final boolCount = _box!.keys.where((k) => k.toString().startsWith('bool_')).length;
+      final bytesCount = _box!.keys.where((k) => k.toString().startsWith('bytes_')).length;
 
       // Calculate approximate size
       int totalSize = 0;

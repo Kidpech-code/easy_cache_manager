@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.7] - 2024-12-05 🔧 Improved Web/WASM Support
+
+### Fixed
+- **Fixed Path Provider for Web**: Enhanced web_path_provider implementation with functional directory stubs
+- **Conditional Import Paths**: Corrected path references for conditional imports
+- **Import Structure**: Consolidated web stub implementations into a single approach
+
 ## [0.1.5] - 2024-12-04 🔧 Full WASM Compatibility & Formatting Fix
 
 ### Fixed
