@@ -3,7 +3,6 @@ description: "High-performance Flutter caching with Hive NoSQL storage, Clean Ar
 version: 0.1.2
 homepage: https://github.com/Kidpech-code/easy_cache_manager
 repository: https://github.com/Kidpech-code/easy_cache_manager
-issue_tracker: https://github.com/Kidpech-code/easy_cache_manager/issues
 documentation: https://pub.dev/packages/easy_cache_manager
 
 funding:

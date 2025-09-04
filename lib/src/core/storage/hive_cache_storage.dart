@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart' as hive_core;
 import 'package:universal_io/io.dart';
-import 'package:path_provider/path_provider.dart';
 import '../../domain/entities/cache_entry.dart';
 import '../../domain/entities/cache_stats.dart';
 import '../../data/models/hive_cache_entry.dart';
@@ -11,6 +10,7 @@ import '../../data/models/hive_cache_stats.dart';
 import '../policies/eviction_policy.dart';
 import '../analytics/cache_analytics.dart';
 import 'platform_cache_storage.dart';
+import 'native_storage_adapter.dart' if (dart.library.html) 'web_path_provider_stub.dart';
 
 /// High-performance Hive-based cache storage
 ///
@@ -82,8 +82,8 @@ class HiveCacheStorage implements PlatformCacheStorage {
     } else {
       // Mobile/Desktop initialization with safe fallbacks for tests
       try {
-        final directory = await getApplicationDocumentsDirectory();
-        await Hive.initFlutter(directory.path);
+        final directoryPath = await NativeStorageAdapter.getDocumentsDirectory();
+        await Hive.initFlutter(directoryPath);
       } catch (e) {
         // Fallback for environments without initialized bindings/plugins (e.g., unit tests)
         final tempDir = await Directory.systemTemp.createTemp('easy_cache_hive');
@@ -103,8 +103,8 @@ class HiveCacheStorage implements PlatformCacheStorage {
   Future<void> _initializeCacheDirectory() async {
     if (kIsWeb) return; // No file system on web
     try {
-      final tempDirectory = await getTemporaryDirectory();
-      _cacheDirectory = '${tempDirectory.path}/easy_cache_hive';
+      final tempDirectoryPath = await NativeStorageAdapter.getCacheDirectory();
+      _cacheDirectory = '$tempDirectoryPath/easy_cache_hive';
     } catch (e) {
       // Fallback when path_provider isn't available (e.g., certain test envs)
       final tempDirectory = await Directory.systemTemp.createTemp('easy_cache_hive');
