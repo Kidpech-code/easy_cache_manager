@@ -1,7 +1,7 @@
 
 # 🚀⚡ Easy Cache Manager
 
-**Version: 0.1.7**
+**Version: 0.1.8**
 
 [![pub package](https://img.shields.io/pub/v/easy_cache_manager.svg)](https://pub.dev/packages/easy_cache_manager)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kidpech/easy_cache_manager/blob/main/LICENSE)
@@ -65,7 +65,7 @@ final cacheManager = CacheManager(
 Add to your `pubspec.yaml`:
 ```yaml
 dependencies:
-  easy_cache_manager: ^0.1.7
+  easy_cache_manager: ^0.1.8
 ```
 Run:
 ```bash
@@ -1094,7 +1094,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  easy_cache_manager: ^0.1.7
+  easy_cache_manager: ^0.1.8
 ```
 
 ### 2. Basic Usage (Minimal Configuration)

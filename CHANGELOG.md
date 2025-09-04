@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.8] - 2024-09-04 🚀 Web/WASM Compatibility & Documentation Improvements
+
+### Changed
+- Full refactor for true Web/WASM compatibility: all dart:io and universal_io imports are now fully abstracted and stubbed for web.
+- Improved conditional imports and platform detection for all storage/network adapters.
+- Documentation and README updated for clarity and completeness.
+- Minor bug fixes and code cleanup across core modules.
+
+### Technical
+- Added web stubs and conditional imports for all platform-specific adapters.
+- Updated README and documentation for new features and migration tips.
+- Bumped version to 0.1.8 for pub.dev publishing.
+
 ## [0.1.7] - 2024-09-04 🛠️ Robust Test Environment Support & Hive Fallbacks
 
 ### Fixed
