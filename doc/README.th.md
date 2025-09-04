@@ -614,7 +614,7 @@ final newsCache = EasyCacheManager.template(AppType.news);
 
 ```yaml
 dependencies:
-  easy_cache_manager: ^0.1.0
+  easy_cache_manager: ^0.1.2
 ```
 
 ### 2. การใช้งานพื้นฐาน (Minimal Configuration)
@@ -679,7 +679,7 @@ cacheManager.statsStream.listen((stats) {
 เพิ่มใน `pubspec.yaml`:
 ```yaml
 dependencies:
-  easy_cache_manager: ^0.1.1
+  easy_cache_manager: ^0.1.2
 ```
 
 ### 2. รันคำสั่ง

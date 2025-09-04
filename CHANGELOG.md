@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.2] - 2024-12-04 🔧 Static Analysis & Generated Files Fix
+
+### Fixed
+- **Generated Files**: Added missing Hive TypeAdapters (HiveCacheEntryAdapter, HiveCacheStatsAdapter)
+- **Static Analysis**: Resolved UNDEFINED_METHOD errors in hive_cache_storage.dart
+- **Downgrade Compatibility**: Fixed compatibility issues with lower bound dependency constraints
+- **URI Generation**: Ensured all .g.dart files are properly generated and committed
+- **Description Length**: Optimized package description to meet pub.dev requirements (60-180 chars)
+
+### Added
+- **Generated TypeAdapters**: hive_cache_entry.g.dart and hive_cache_stats.g.dart now included
+- **Build Configuration**: Enhanced build.yaml for proper code generation
+- **Static Analysis Score**: Achieved 50/50 points for static analysis compliance
+
+### Technical
+- Fixed downgrade analysis that was failing with 4 UNDEFINED_METHOD errors
+- Ensured URI_HAS_NOT_BEEN_GENERATED issues are resolved
+- Package now passes all pub.dev static analysis requirements
+
 ## [0.1.1] - 2024-12-04 ⚡ Dependency Optimization Update
 
 ### Fixed
