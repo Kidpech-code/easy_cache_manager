@@ -101,7 +101,8 @@ class SimpleCacheStorage implements SimpleCacheStorageInterface {
           } catch (initError) {
             // If both fail, we'll use in-memory storage
             if (kDebugMode) {
-              debugPrint('SimpleCacheStorage: fallback to in-memory (temp) failed: $initError');
+              debugPrint(
+                  'SimpleCacheStorage: fallback to in-memory (temp) failed: $initError');
             }
           }
         }
@@ -120,7 +121,8 @@ class SimpleCacheStorage implements SimpleCacheStorageInterface {
   /// Ensure storage is initialized
   void _ensureInitialized() {
     if (!_initialized || _box == null) {
-      throw StateError('SimpleCacheStorage not initialized. Call init() first.');
+      throw StateError(
+          'SimpleCacheStorage not initialized. Call init() first.');
     }
   }
 
@@ -291,11 +293,16 @@ class SimpleCacheStorage implements SimpleCacheStorageInterface {
     _ensureInitialized();
     try {
       final keys = _box!.keys.length;
-      final jsonCount = _box!.keys.where((k) => k.toString().startsWith('json_')).length;
-      final stringCount = _box!.keys.where((k) => k.toString().startsWith('string_')).length;
-      final intCount = _box!.keys.where((k) => k.toString().startsWith('int_')).length;
-      final boolCount = _box!.keys.where((k) => k.toString().startsWith('bool_')).length;
-      final bytesCount = _box!.keys.where((k) => k.toString().startsWith('bytes_')).length;
+      final jsonCount =
+          _box!.keys.where((k) => k.toString().startsWith('json_')).length;
+      final stringCount =
+          _box!.keys.where((k) => k.toString().startsWith('string_')).length;
+      final intCount =
+          _box!.keys.where((k) => k.toString().startsWith('int_')).length;
+      final boolCount =
+          _box!.keys.where((k) => k.toString().startsWith('bool_')).length;
+      final bytesCount =
+          _box!.keys.where((k) => k.toString().startsWith('bytes_')).length;
 
       // Calculate approximate size
       int totalSize = 0;
