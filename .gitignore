@@ -37,6 +37,7 @@ test/benchmarks/
 
 # Build and generated files
 **/*.g.dart
+!lib/src/data/models/*.g.dart
 **/*.freezed.dart
 
 # Generated docs
