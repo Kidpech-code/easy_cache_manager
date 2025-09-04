@@ -743,7 +743,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  easy_cache_manager: ^0.1.7
+  easy_cache_manager: ^0.1.6
 ```
 
 ### 2. Basic Usage (Minimal Configuration)

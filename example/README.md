@@ -3,7 +3,7 @@
 ```bash
 # Add to your pubspec.yaml
 dependencies:
-  easy_cache_manager: ^0.1.7
+  easy_cache_manager: ^0.1.6
 
 # Install
 flutter pub get
