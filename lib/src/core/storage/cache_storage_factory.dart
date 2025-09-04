@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'platform_cache_storage.dart';
 import 'hive_cache_storage.dart';
@@ -55,18 +54,8 @@ class CacheStorageFactory {
   static String _getCurrentPlatform() {
     if (kIsWeb) {
       return 'Web';
-    } else if (Platform.isAndroid) {
-      return 'Android';
-    } else if (Platform.isIOS) {
-      return 'iOS';
-    } else if (Platform.isWindows) {
-      return 'Windows';
-    } else if (Platform.isMacOS) {
-      return 'macOS';
-    } else if (Platform.isLinux) {
-      return 'Linux';
     } else {
-      return 'Unknown';
+      return 'Native';
     }
   }
 
@@ -79,14 +68,6 @@ class CacheStorageFactory {
         'background_sync': false,
         'compression': false,
         'encryption': false
-      };
-    } else if (Platform.isAndroid || Platform.isIOS) {
-      return {
-        'persistent_storage': true,
-        'large_files': true,
-        'background_sync': true,
-        'compression': true,
-        'encryption': true
       };
     } else {
       return {
@@ -105,9 +86,9 @@ class CacheStorageFactory {
       case 'web':
         return kIsWeb;
       case 'mobile':
-        return Platform.isAndroid || Platform.isIOS;
+        return !kIsWeb;
       case 'desktop':
-        return Platform.isWindows || Platform.isMacOS || Platform.isLinux;
+        return !kIsWeb;
       default:
         return false;
     }

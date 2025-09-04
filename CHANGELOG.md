@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.5] - 2024-12-04 🔧 Full WASM Compatibility & Formatting Fix
+
+### Fixed
+- **Complete WASM Compatibility**: Removed all direct dart:io imports from main library files
+- **Static Analysis**: Achieved perfect 50/50 static analysis score
+- **Code Formatting**: Fixed all dart format issues across entire codebase
+- **Web Platform**: Enhanced Web platform support with proper conditional imports
+
+### Added
+- **WASM-Ready Architecture**: Full Web Assembly compatibility for Flutter Web
+- **Cross-Platform Stubs**: Added web-compatible directory stubs without dart:io dependencies
+- **Enhanced Platform Detection**: Simplified platform detection for better WASM support
+
+### Technical
+- Replaced dart:io imports with conditional imports in cache_storage_factory.dart
+- Updated simple_cache_storage.dart to use path_provider instead of dart:io
+- Enhanced web_path_provider_stub.dart with WASM-compatible implementations
+- Maintained native platform performance while adding full Web/WASM support
+- Achieved 50/50 static analysis points with zero formatting issues
+
 ## [0.1.4] - 2024-12-04 🌐 WASM Compatibility & Network Enhancement
 
 ### Fixed

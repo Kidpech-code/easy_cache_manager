@@ -6,9 +6,9 @@
 library simple_cache_storage;
 
 import 'dart:convert';
-import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/foundation.dart';
+import 'package:path_provider/path_provider.dart';
 
 /// Simple storage interface for key-value data
 abstract class SimpleCacheStorageInterface {
@@ -90,8 +90,7 @@ class SimpleCacheStorage implements SimpleCacheStorageInterface {
           // If Flutter initialization fails (like in testing), use regular Hive
           // This is common in unit tests where Flutter bindings aren't available
           try {
-            final tempDir =
-                Directory.systemTemp.createTempSync('hive_cache_test');
+            final tempDir = await getTemporaryDirectory();
             Hive.init(tempDir.path);
           } catch (initError) {
             // If both fail, we'll use in-memory storage

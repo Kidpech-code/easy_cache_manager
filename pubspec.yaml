@@ -1,6 +1,6 @@
 name: easy_cache_manager
 description: "High-performance Flutter caching with Hive NoSQL storage, Clean Architecture, intelligent eviction policies, and cross-platform WASM support."
-version: 0.1.4
+version: 0.1.5
 homepage: https://github.com/Kidpech-code/easy_cache_manager
 repository: https://github.com/Kidpech-code/easy_cache_manager
 documentation: https://pub.dev/packages/easy_cache_manager
