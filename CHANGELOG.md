@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3] - 2024-12-04 📦 Generated Files & Pub.dev Optimization
+
+### Fixed
+- **Generated TypeAdapters**: Ensured all Hive TypeAdapters are properly committed
+- **Repository Management**: Added explicit commit for generated files
+- **Pub.dev Compliance**: Final optimization for maximum pub.dev scoring
+
+### Added
+- **Build Artifacts**: Committed hive_cache_entry.g.dart and hive_cache_stats.g.dart
+- **Version Management**: Updated version references across all documentation
+
+### Technical
+- Explicit git management of generated Hive TypeAdapter files
+- Enhanced repository structure for package distribution
+- Final preparations for pub.dev publication
+
 ## [0.1.2] - 2024-12-04 🔧 Static Analysis & Generated Files Fix
 
 ### Fixed
