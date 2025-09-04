@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hive/hive.dart' as hive_core;
+import 'package:universal_io/io.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../domain/entities/cache_entry.dart';
 import '../../domain/entities/cache_stats.dart';
@@ -86,8 +86,7 @@ class HiveCacheStorage implements PlatformCacheStorage {
         await Hive.initFlutter(directory.path);
       } catch (e) {
         // Fallback for environments without initialized bindings/plugins (e.g., unit tests)
-        final tempDir =
-            await Directory.systemTemp.createTemp('easy_cache_hive');
+        final tempDir = await Directory.systemTemp.createTemp('easy_cache_hive');
         hive_core.Hive.init(tempDir.path);
       }
     }
@@ -108,8 +107,7 @@ class HiveCacheStorage implements PlatformCacheStorage {
       _cacheDirectory = '${tempDirectory.path}/easy_cache_hive';
     } catch (e) {
       // Fallback when path_provider isn't available (e.g., certain test envs)
-      final tempDirectory =
-          await Directory.systemTemp.createTemp('easy_cache_hive');
+      final tempDirectory = await Directory.systemTemp.createTemp('easy_cache_hive');
       _cacheDirectory = tempDirectory.path;
     }
 
@@ -120,8 +118,7 @@ class HiveCacheStorage implements PlatformCacheStorage {
   }
 
   @override
-  Future<void> store(
-      String key, dynamic data, Map<String, dynamic> metadata) async {
+  Future<void> store(String key, dynamic data, Map<String, dynamic> metadata) async {
     try {
       final now = DateTime.now();
       final entryCount = _cacheBox?.length ?? 0;
@@ -130,9 +127,7 @@ class HiveCacheStorage implements PlatformCacheStorage {
       const maxSize = 100 * 1024 * 1024; // default 100MB
 
       // Eviction policy check
-      if (evictionPolicy != null &&
-          evictionPolicy!
-              .shouldEvict(key, currentSize, maxSize, entryCount, maxEntries)) {
+      if (evictionPolicy != null && evictionPolicy!.shouldEvict(key, currentSize, maxSize, entryCount, maxEntries)) {
         final toEvict = evictionPolicy!.selectKeysToEvict(_keyAccessMap, 1);
         for (final k in toEvict) {
           await remove(k);
@@ -143,14 +138,9 @@ class HiveCacheStorage implements PlatformCacheStorage {
       final entry = HiveCacheEntry(
         key: key,
         data: data,
-        createdAt: DateTime.fromMillisecondsSinceEpoch(
-            metadata['created_at'] ?? now.millisecondsSinceEpoch),
-        expiresAt: metadata['expires_at'] != null
-            ? DateTime.fromMillisecondsSinceEpoch(metadata['expires_at'])
-            : null,
-        headers: metadata['headers'] != null
-            ? Map<String, String>.from(metadata['headers'])
-            : null,
+        createdAt: DateTime.fromMillisecondsSinceEpoch(metadata['created_at'] ?? now.millisecondsSinceEpoch),
+        expiresAt: metadata['expires_at'] != null ? DateTime.fromMillisecondsSinceEpoch(metadata['expires_at']) : null,
+        headers: metadata['headers'] != null ? Map<String, String>.from(metadata['headers']) : null,
         etag: metadata['etag'],
         statusCode: metadata['status_code'],
         contentType: metadata['content_type'] ?? 'application/json',
@@ -162,11 +152,7 @@ class HiveCacheStorage implements PlatformCacheStorage {
       await _cacheBox!.put(key, entry);
       sw.stop();
       _keyAccessMap[key] = now;
-      analytics?.recordEvent(CacheAnalyticsEvent(
-          type: 'store',
-          key: key,
-          sizeBytes: entry.sizeInBytes,
-          latency: sw.elapsed));
+      analytics?.recordEvent(CacheAnalyticsEvent(type: 'store', key: key, sizeBytes: entry.sizeInBytes, latency: sw.elapsed));
 
       // Update stats
       _stats!.totalEntries = _cacheBox!.length;
@@ -180,8 +166,7 @@ class HiveCacheStorage implements PlatformCacheStorage {
   }
 
   @override
-  Future<void> storeBytes(
-      String key, Uint8List bytes, Map<String, dynamic> metadata) async {
+  Future<void> storeBytes(String key, Uint8List bytes, Map<String, dynamic> metadata) async {
     try {
       final now = DateTime.now();
       String? filePath;
@@ -203,14 +188,9 @@ class HiveCacheStorage implements PlatformCacheStorage {
       final entry = HiveCacheEntry(
         key: key,
         data: filePath ?? 'hive_binary_$key',
-        createdAt: DateTime.fromMillisecondsSinceEpoch(
-            metadata['created_at'] ?? now.millisecondsSinceEpoch),
-        expiresAt: metadata['expires_at'] != null
-            ? DateTime.fromMillisecondsSinceEpoch(metadata['expires_at'])
-            : null,
-        headers: metadata['headers'] != null
-            ? Map<String, String>.from(metadata['headers'])
-            : null,
+        createdAt: DateTime.fromMillisecondsSinceEpoch(metadata['created_at'] ?? now.millisecondsSinceEpoch),
+        expiresAt: metadata['expires_at'] != null ? DateTime.fromMillisecondsSinceEpoch(metadata['expires_at']) : null,
+        headers: metadata['headers'] != null ? Map<String, String>.from(metadata['headers']) : null,
         etag: metadata['etag'],
         statusCode: metadata['status_code'],
         contentType: metadata['content_type'] ?? 'application/octet-stream',
@@ -242,8 +222,7 @@ class HiveCacheStorage implements PlatformCacheStorage {
       if (entry == null) {
         _stats!.incrementMiss();
         await _statsBox!.put('main', _stats!);
-        analytics?.recordEvent(
-            CacheAnalyticsEvent(type: 'miss', key: key, latency: sw.elapsed));
+        analytics?.recordEvent(CacheAnalyticsEvent(type: 'miss', key: key, latency: sw.elapsed));
         return null;
       }
 
@@ -252,15 +231,13 @@ class HiveCacheStorage implements PlatformCacheStorage {
         await remove(key);
         _stats!.incrementMiss();
         await _statsBox!.put('main', _stats!);
-        analytics?.recordEvent(
-            CacheAnalyticsEvent(type: 'miss', key: key, latency: sw.elapsed));
+        analytics?.recordEvent(CacheAnalyticsEvent(type: 'miss', key: key, latency: sw.elapsed));
         return null;
       }
 
       _stats!.incrementHit();
       await _statsBox!.put('main', _stats!);
-      analytics?.recordEvent(
-          CacheAnalyticsEvent(type: 'hit', key: key, latency: sw.elapsed));
+      analytics?.recordEvent(CacheAnalyticsEvent(type: 'hit', key: key, latency: sw.elapsed));
 
       return entry.toEntity();
     } catch (e) {
@@ -482,8 +459,7 @@ class HiveCacheStorage implements PlatformCacheStorage {
         final entryCount = _cacheBox?.length ?? 0;
         const maxEntries = 10000;
         if (evictionPolicy!.shouldEvict('', 0, 0, entryCount, maxEntries)) {
-          final toEvict = evictionPolicy!
-              .selectKeysToEvict(_keyAccessMap, entryCount - maxEntries);
+          final toEvict = evictionPolicy!.selectKeysToEvict(_keyAccessMap, entryCount - maxEntries);
           for (final k in toEvict) {
             await remove(k);
           }
@@ -552,9 +528,7 @@ class HiveCacheStorage implements PlatformCacheStorage {
       'total_entries': _cacheBox?.length ?? 0,
       'binary_entries': _binaryBox?.length ?? 0,
       'hit_rate': _stats?.hitRate ?? 0.0,
-      'average_load_time_ms': _stats != null
-          ? _stats!.toEntity().averageLoadTime.inMilliseconds
-          : 0,
+      'average_load_time_ms': _stats != null ? _stats!.toEntity().averageLoadTime.inMilliseconds : 0,
       'last_cleanup': _stats?.lastCleanup.toIso8601String(),
       'platform_optimized': !kIsWeb, // File system optimization available
     };

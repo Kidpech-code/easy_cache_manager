@@ -39,6 +39,12 @@ dependencies:
   path_provider: ">=2.0.0 <3.0.0"
   path: ">=1.8.0 <2.0.0"
 
+  # Universal IO for WASM compatibility
+  universal_io: ">=2.0.0 <3.0.0"
+
+  # Web support for WASM compatibility
+  web: ">=0.5.1 <2.0.0"
+
   # Cryptography for hashing and encryption
   crypto: ">=3.0.0 <4.0.0"
 
