@@ -8,7 +8,7 @@ void main(List<String> args) async {
 
   if (args.isNotEmpty && args[0] == 'watch') {
     final cacheManager = CacheManager(
-      config: const CacheConfig(
+      config: const AdvancedCacheConfig(
         maxCacheSize: 100 * 1024 * 1024,
         stalePeriod: Duration(days: 7),
         autoCleanup: true,

@@ -1,12 +1,80 @@
-import '../entities/cache_stats.dart';
-import '../repositories/cache_repository.dart';
-import '../../core/error/failures.dart';
+import 'dart:typed_data';
+
+import 'package:easy_cache_manager/easy_cache_manager.dart';
+import 'package:easy_cache_manager/src/domain/repositories/cache_repository.dart';
 
 /// Use case for cache management operations
 class CacheManagementUseCase {
   final CacheRepository cacheRepository;
 
   CacheManagementUseCase({required this.cacheRepository});
+
+  /// Save JSON data to cache
+  Future<void> saveJson(String key, Map<String, dynamic> value,
+      {Duration? maxAge}) async {
+    try {
+      await cacheRepository.store(key, value,
+          maxAge: maxAge, contentType: 'application/json');
+    } catch (e) {
+      throw StorageFailure(
+          message: 'Failed to save JSON: $e', originalError: e);
+    }
+  }
+
+  /// Save binary data to cache
+  Future<void> saveBytes(String key, Uint8List value,
+      {Duration? maxAge}) async {
+    try {
+      await cacheRepository.storeBytes(key, value,
+          maxAge: maxAge, contentType: 'application/octet-stream');
+    } catch (e) {
+      throw StorageFailure(
+          message: 'Failed to save bytes: $e', originalError: e);
+    }
+  }
+
+  /// Save string data to cache
+  Future<void> saveString(String key, String value, {Duration? maxAge}) async {
+    try {
+      await cacheRepository.store(key, value,
+          maxAge: maxAge, contentType: 'text/plain');
+    } catch (e) {
+      throw StorageFailure(
+          message: 'Failed to save string: $e', originalError: e);
+    }
+  }
+
+  /// Save int data to cache
+  Future<void> saveInt(String key, int value, {Duration? maxAge}) async {
+    try {
+      await cacheRepository.store(key, value,
+          maxAge: maxAge, contentType: 'application/x-int');
+    } catch (e) {
+      throw StorageFailure(message: 'Failed to save int: $e', originalError: e);
+    }
+  }
+
+  /// Save double data to cache
+  Future<void> saveDouble(String key, double value, {Duration? maxAge}) async {
+    try {
+      await cacheRepository.store(key, value,
+          maxAge: maxAge, contentType: 'application/x-double');
+    } catch (e) {
+      throw StorageFailure(
+          message: 'Failed to save double: $e', originalError: e);
+    }
+  }
+
+  /// Save bool data to cache
+  Future<void> saveBool(String key, bool value, {Duration? maxAge}) async {
+    try {
+      await cacheRepository.store(key, value,
+          maxAge: maxAge, contentType: 'application/x-bool');
+    } catch (e) {
+      throw StorageFailure(
+          message: 'Failed to save bool: $e', originalError: e);
+    }
+  }
 
   /// Clear all cached data
   Future<void> clearCache() async {

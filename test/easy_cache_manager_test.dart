@@ -7,7 +7,7 @@ void main() {
 
     setUp(() {
       cacheManager = CacheManager(
-        config: const CacheConfig(
+        config: const AdvancedCacheConfig(
           maxCacheSize: 10 * 1024 * 1024, // 10MB for testing
           stalePeriod: Duration(minutes: 30),
           enableLogging: true,
@@ -27,7 +27,7 @@ void main() {
     });
 
     test('Cache config creation', () {
-      const config = CacheConfig(
+      const config = AdvancedCacheConfig(
           maxCacheSize: 50 * 1024 * 1024,
           stalePeriod: Duration(hours: 2),
           enableOfflineMode: true,
@@ -40,7 +40,7 @@ void main() {
     });
 
     test('Cache config with defaults', () {
-      const config = CacheConfig();
+      const config = AdvancedCacheConfig();
 
       expect(config.maxCacheSize, equals(100 * 1024 * 1024));
       expect(config.stalePeriod, equals(const Duration(days: 7)));
@@ -51,7 +51,7 @@ void main() {
     });
 
     test('Cache config copyWith', () {
-      const original = CacheConfig();
+      const original = AdvancedCacheConfig();
       final modified = original.copyWith(
           maxCacheSize: 200 * 1024 * 1024, enableOfflineMode: false);
 
@@ -224,7 +224,7 @@ void main() {
   group('Integration Tests', () {
     test('Cache manager streams', () async {
       final cacheManager =
-          CacheManager(config: const CacheConfig(enableLogging: true));
+          CacheManager(config: const AdvancedCacheConfig(enableLogging: true));
 
       // Test status stream
       expect(cacheManager.statusStream, isA<Stream<CacheStatusInfo>>());
@@ -239,7 +239,7 @@ void main() {
 
     test('Cache operations', () async {
       final cacheManager =
-          CacheManager(config: const CacheConfig(enableLogging: true));
+          CacheManager(config: const AdvancedCacheConfig(enableLogging: true));
 
       // Test basic operations
       expect(await cacheManager.contains('nonexistent'), isFalse);

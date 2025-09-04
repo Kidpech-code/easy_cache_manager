@@ -1121,6 +1121,111 @@ class _CustomScenariosScreenState extends State<CustomScenariosScreen>
       ),
 
       _CustomScenario(
+        name: 'Health & Fitness App',
+        description:
+            'Cache workout plans, progress, and nutrition logs for instant access and offline usability.',
+        category: 'Health & Fitness',
+        industry: 'Wellness',
+        complexity: 'Simple',
+        icon: Icons.fitness_center,
+        color: Colors.pink,
+        steps: [
+          _ScenarioStep('write', 'Save workout plan', 'workout', 10, 20,
+              'Saving workout plans'),
+          _ScenarioStep('read', 'Load workout plan', 'workout', 10, 20,
+              'Loading workout plans'),
+          _ScenarioStep('write', 'Save nutrition log', 'nutrition', 10, 20,
+              'Saving nutrition logs'),
+          _ScenarioStep('read', 'Load nutrition log', 'nutrition', 10, 20,
+              'Loading nutrition logs'),
+        ],
+      ),
+
+      _CustomScenario(
+        name: 'Education Platform',
+        description:
+            'Cache course content, quiz results, and user progress for fast access and reduced bandwidth.',
+        category: 'Education',
+        industry: 'EdTech',
+        complexity: 'Simple',
+        icon: Icons.school,
+        color: Colors.indigo,
+        steps: [
+          _ScenarioStep('write', 'Save course content', 'course', 5, 30,
+              'Saving course materials'),
+          _ScenarioStep('read', 'Load course content', 'course', 5, 30,
+              'Loading course materials'),
+          _ScenarioStep('write', 'Save quiz result', 'quiz', 5, 20,
+              'Saving quiz results'),
+          _ScenarioStep('read', 'Load quiz result', 'quiz', 5, 20,
+              'Loading quiz results'),
+        ],
+      ),
+
+      _CustomScenario(
+        name: 'Real-time Chat',
+        description:
+            'Cache messages, user status, and media for instant chat experience and offline history.',
+        category: 'Communication',
+        industry: 'Social',
+        complexity: 'Simple',
+        icon: Icons.chat,
+        color: Colors.lightBlue,
+        steps: [
+          _ScenarioStep('write', 'Save messages', 'message', 20, 10,
+              'Saving chat messages'),
+          _ScenarioStep('read', 'Load messages', 'message', 20, 10,
+              'Loading chat messages'),
+          _ScenarioStep('write', 'Save user status', 'status', 10, 10,
+              'Saving user status'),
+          _ScenarioStep('read', 'Load user status', 'status', 10, 10,
+              'Loading user status'),
+        ],
+      ),
+
+      _CustomScenario(
+        name: 'Travel Booking',
+        description:
+            'Cache flight/hotel data and user itineraries for fast search and booking.',
+        category: 'Travel',
+        industry: 'Tourism',
+        complexity: 'Simple',
+        icon: Icons.flight,
+        color: Colors.deepPurple,
+        steps: [
+          _ScenarioStep('write', 'Save flight search', 'flight', 5, 40,
+              'Saving flight search results'),
+          _ScenarioStep('read', 'Load flight search', 'flight', 5, 40,
+              'Loading flight search results'),
+          _ScenarioStep('write', 'Save itinerary', 'itinerary', 5, 30,
+              'Saving user itineraries'),
+          _ScenarioStep('read', 'Load itinerary', 'itinerary', 5, 30,
+              'Loading user itineraries'),
+        ],
+      ),
+
+      _CustomScenario(
+        name: 'Gaming Leaderboard',
+        description:
+            'Cache scores, player stats, and match history for instant leaderboard and profile access.',
+        category: 'Gaming',
+        industry: 'Entertainment',
+        complexity: 'Simple',
+        icon: Icons.emoji_events,
+        color: Colors.amber,
+        steps: [
+          _ScenarioStep('write', 'Save leaderboard', 'leaderboard', 10, 20,
+              'Saving leaderboard data'),
+          _ScenarioStep('read', 'Load leaderboard', 'leaderboard', 10, 20,
+              'Loading leaderboard data'),
+          _ScenarioStep('write', 'Save player stats', 'stats', 10, 20,
+              'Saving player stats'),
+          _ScenarioStep('read', 'Load player stats', 'stats', 10, 20,
+              'Loading player stats'),
+        ],
+      ),
+
+      _CustomScenario(
         name: 'Social Media App',
         description:
             'A social platform that caches user feeds, profile information, and media content for instant loading.',

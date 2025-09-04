@@ -62,6 +62,7 @@ import '../core/storage/hive_cache_storage.dart';
 ///   print('Status: ${status.status}');
 /// });
 /// ```
+
 class CacheManager {
   late final GetJsonUseCase _getJsonUseCase;
   late final GetBytesUseCase _getBytesUseCase;
@@ -75,41 +76,60 @@ class CacheManager {
   Timer? _cleanupTimer;
 
   /// Stream of cache status updates providing real-time monitoring
-  ///
-  /// Emits [CacheStatusInfo] objects with current status, messages, and timestamps.
-  /// Useful for displaying cache health in UI or debugging cache operations.
   Stream<CacheStatusInfo> get statusStream => _statusController.stream;
 
   /// Stream of cache statistics providing real-time performance metrics
-  ///
-  /// Emits [CacheStats] objects with hit rates, size information, and performance data.
-  /// Perfect for monitoring cache efficiency and making optimization decisions.
   Stream<CacheStats> get statsStream => _statsController.stream;
 
   /// Current cache status information
-  ///
-  /// Returns the latest [CacheStatusInfo] without creating a stream subscription.
   CacheStatusInfo get currentStatus => _statusController.value;
 
   /// Current cache statistics
-  ///
-  /// Returns the latest [CacheStats] without creating a stream subscription.
   CacheStats get currentStats => _statsController.value;
 
-  CacheManager(
-      {required this.config,
-      HiveCacheStorage? hiveCacheStorage,
-      NetworkRemoteDataSource? remoteDataSource,
-      NetworkInfo? networkInfo})
-      : _statusController = BehaviorSubject<CacheStatusInfo>.seeded(
+  CacheManager({
+    required this.config,
+    HiveCacheStorage? hiveCacheStorage,
+    NetworkRemoteDataSource? remoteDataSource,
+    NetworkInfo? networkInfo,
+  })  : _statusController = BehaviorSubject<CacheStatusInfo>.seeded(
           CacheStatusInfo(
-              status: CacheStatus.loading,
-              message: 'Initializing high-performance Hive cache...',
-              timestamp: DateTime.now()),
+            status: CacheStatus.loading,
+            message: 'Initializing high-performance Hive cache...',
+            timestamp: DateTime.now(),
+          ),
         ),
         _statsController =
             BehaviorSubject<CacheStats>.seeded(CacheStats.empty()) {
     _initialize(hiveCacheStorage, remoteDataSource, networkInfo);
+  }
+
+  /// Save data to cache (JSON or bytes)
+  Future<void> save(String key, dynamic value, {Duration? maxAge}) async {
+    try {
+      if (value is Map<String, dynamic>) {
+        await _cacheManagementUseCase.saveJson(key, value, maxAge: maxAge);
+      } else if (value is Uint8List) {
+        await _cacheManagementUseCase.saveBytes(key, value, maxAge: maxAge);
+      } else if (value is String) {
+        await _cacheManagementUseCase.saveString(key, value, maxAge: maxAge);
+      } else {
+        throw Exception(
+            'Unsupported value type for save: ${value.runtimeType}');
+      }
+      await _updateStats();
+      _statusController.add(CacheStatusInfo(
+        status: CacheStatus.cached,
+        message: 'Saved $key to cache',
+        timestamp: DateTime.now(),
+      ));
+    } catch (e) {
+      _statusController.add(CacheStatusInfo.error(
+        message: 'Failed to save $key: $e',
+        key: key,
+      ));
+      rethrow;
+    }
   }
 
   void _initialize(HiveCacheStorage? hiveCacheStorage,

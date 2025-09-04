@@ -1,4 +1,3 @@
-
 # 🚀⚡ Easy Cache Manager
 
 **Version: 0.1.8**
@@ -33,6 +32,7 @@ Built with Clean Architecture and Domain-Driven Design (DDD) principles, powered
 ## Introduction & Philosophy
 
 Easy Cache Manager is designed to be:
+
 - **Beginner-friendly:** Zero-config, simple APIs, and step-by-step guides.
 - **Professional-grade:** Advanced configuration, plugin architecture, analytics, and robust error handling.
 - **Flexible:** Supports all major platforms (Web, Mobile, Desktop) and adapts to your app's needs.
@@ -43,18 +43,21 @@ Easy Cache Manager is designed to be:
 ## Quick Start
 
 ### Zero-Config Usage
+
 ```dart
 import 'package:easy_cache_manager/easy_cache_manager.dart';
 final cache = EasyCacheManager.auto(); // Smart defaults for your app
 ```
 
 ### Template Usage
+
 ```dart
 final ecommerceCache = EasyCacheManager.template(AppType.ecommerce);
 final socialCache = EasyCacheManager.template(AppType.social);
 ```
 
 ### Minimal Configuration
+
 ```dart
 final cacheManager = CacheManager(
   config: MinimalCacheConfig.small(), // 10MB cache
@@ -62,12 +65,16 @@ final cacheManager = CacheManager(
 ```
 
 ### Installation
+
 Add to your `pubspec.yaml`:
+
 ```yaml
 dependencies:
   easy_cache_manager: ^0.1.8
 ```
+
 Run:
+
 ```bash
 flutter pub get
 ```
@@ -77,7 +84,9 @@ flutter pub get
 ## Beginner Usage & Widgets
 
 ### Flutter Widget Integration
+
 Cache images/files in widgets for bandwidth savings and speed.
+
 ```dart
 class CachedImageWidget extends StatelessWidget {
   final String url;
@@ -107,7 +116,9 @@ class CachedImageWidget extends StatelessWidget {
 ```
 
 ### REST API Integration
+
 Cache API responses to reduce repeated calls and speed up UX.
+
 ```dart
 Future<Map<String, dynamic>> fetchUser(String id) async {
   final cached = await cacheManager.getJson('user_$id');
@@ -120,7 +131,9 @@ Future<Map<String, dynamic>> fetchUser(String id) async {
 ```
 
 ### Manual Cache Management
+
 Full control over cache lifecycle.
+
 ```dart
 bool hasData = await cacheManager.contains('cache_key');
 await cacheManager.removeItem('cache_key');
@@ -135,12 +148,14 @@ await cacheManager.clearCache();
 ## Advanced Configuration & Edge Cases
 
 ### TTL/Expiration per Key
+
 ```dart
 await cacheManager.save('token', token, maxAge: const Duration(hours: 1));
 await cacheManager.save('profile', profile, maxAge: const Duration(days: 1));
 ```
 
 ### Size-based & Composite Eviction
+
 ```dart
 final cacheManager = CacheManager(
   config: AdvancedCacheConfig.production(),
@@ -154,6 +169,7 @@ final cacheManager = CacheManager(
 ```
 
 ### Offline-first API
+
 ```dart
 Future<Map<String, dynamic>> fetchData(String key, String url) async {
   final cached = await cacheManager.getJson(key);
@@ -170,6 +186,7 @@ Future<Map<String, dynamic>> fetchData(String key, String url) async {
 ```
 
 ### Encryption/Decryption
+
 ```dart
 final cacheManager = CacheManager(
   config: AdvancedCacheConfig.production(
@@ -180,12 +197,14 @@ final cacheManager = CacheManager(
 ```
 
 ### Custom Data Type
+
 ```dart
 await cacheManager.save('image_bytes', imageBytes);
 final bytes = await cacheManager.getBytes('image_bytes');
 ```
 
 ### Error Handling
+
 ```dart
 try {
   final data = await cacheManager.getJson('key');
@@ -199,6 +218,7 @@ try {
 ## Enterprise & Power User Features
 
 ### Custom Analytics Integration
+
 ```dart
 class MyAnalytics implements CacheAnalytics {
   @override
@@ -218,6 +238,7 @@ final cacheManager = CacheManager(
 ```
 
 ### Multi-tenant Cache
+
 ```dart
 final cacheManager = CacheManager(
   config: AdvancedCacheConfig.production(
@@ -227,6 +248,7 @@ final cacheManager = CacheManager(
 ```
 
 ### Plugin Architecture
+
 ```dart
 class MyDataSource implements CacheStorage {
   // ... implement custom storage logic ...
@@ -238,6 +260,7 @@ final cacheManager = CacheManager(
 ```
 
 ### Benchmark & Performance Testing
+
 ```dart
 void runPerformanceTest() async {
   final benchmark = CacheBenchmarkSuite(
@@ -270,10 +293,12 @@ Cache manager auto-selects best storage/optimization for platform.
 ## Migration & Fallback Strategies
 
 ### Migrating from SQLite/Other Cache Managers
+
 - Use provided migration utilities to move data to Hive.
 - Fallback logic ensures cache is always available, even in test environments or on unsupported platforms.
 
 ### Robust Hive Initialization
+
 - Automatic fallback for test environments and Web/WASM.
 - Conditional imports and platform detection ensure reliability.
 
@@ -284,6 +309,7 @@ Cache manager auto-selects best storage/optimization for platform.
 ### Why Hive NoSQL?
 
 Migrated to Hive NoSQL for performance and reduced overhead:
+
 ```
 Operation         Before (SQLite)    After (Hive)     Improvement
 ──────────────────────────────────────────────────────
@@ -303,6 +329,7 @@ API Cache Hit     25ms → 1ms         🚀 25x faster
 ## Analytics, Monitoring & Debugging
 
 ### Real-time Statistics
+
 ```dart
 final stats = await cacheManager.getStats();
 print('Hit rate: ${stats.hitRate.toStringAsFixed(1)}%');
@@ -315,12 +342,14 @@ cacheManager.statsStream.listen((stats) {
 ```
 
 ### Export Metrics
+
 ```dart
 final metrics = cacheManager.storage.analytics?.exportMetrics();
 print(jsonEncode(metrics));
 ```
 
 ### Debugging/Tracing
+
 ```dart
 final cacheManager = CacheManager(
   config: AdvancedCacheConfig.production(
@@ -334,19 +363,25 @@ final cacheManager = CacheManager(
 ## Testing & Best Practices
 
 ### Testing
+
 Run unit tests:
+
 ```bash
 flutter test
 ```
+
 Run integration tests:
+
 ```bash
 flutter test integration_test/
 ```
 
 ### Lint Best Practices
+
 - Use `const` for Duration, String, List, Map constants
 - Always use curly braces in if/for/while
 - Add comments explaining logic in tests and examples
+
 ```dart
 final map = {
   'a': now.subtract(const Duration(minutes: 3)),
@@ -386,10 +421,77 @@ If this package helped you, please give it a ⭐ on [pub.dev](https://pub.dev/pa
 
 Below are grouped, numbered, and complete scenarios for Easy Cache Manager, with use case, code, and expected results. These cover beginner, advanced, and enterprise needs.
 
+## 4. More Real-World Scenarios
+
+### 4.1 Health & Fitness App
+
+**Use case:** Cache workout plans, progress, nutrition logs for offline access and instant UX.
+
+```dart
+// Save workout plan
+await cacheManager.save('workout_plan', workoutPlan);
+// Get cached plan
+final plan = await cacheManager.getJson('workout_plan');
+// Save nutrition log
+await cacheManager.save('nutrition_log', nutritionLog);
+```
+
+**Expected:** User can view plans/logs instantly, even offline.
+
+### 4.2 Education Platform
+
+**Use case:** Cache course content, quiz results, user progress for fast access and reduced bandwidth.
+
+```dart
+await cacheManager.save('course_math101', courseContent);
+final content = await cacheManager.getJson('course_math101');
+await cacheManager.save('quiz_result_1', quizResult);
+```
+
+**Expected:** Course/quiz data loads instantly, supports offline study.
+
+### 4.3 Real-time Chat
+
+**Use case:** Cache messages, user status, media for instant chat experience and offline history.
+
+```dart
+await cacheManager.save('chat_room_42', messages);
+final cachedMessages = await cacheManager.getJson('chat_room_42');
+await cacheManager.save('user_status_42', status);
+```
+
+**Expected:** Chat history and status available instantly, even offline.
+
+### 4.4 Travel Booking
+
+**Use case:** Cache flight/hotel data, user itineraries for fast search and booking.
+
+```dart
+await cacheManager.save('flight_search_LAX_BKK', flightResults);
+final flights = await cacheManager.getJson('flight_search_LAX_BKK');
+await cacheManager.save('user_itinerary_42', itinerary);
+```
+
+**Expected:** Search results and itineraries load instantly, even with poor connection.
+
+### 4.5 Gaming Leaderboard
+
+**Use case:** Cache scores, player stats, match history for instant leaderboard and profile access.
+
+```dart
+await cacheManager.save('leaderboard_global', leaderboardData);
+final leaderboard = await cacheManager.getJson('leaderboard_global');
+await cacheManager.save('player_stats_42', stats);
+```
+
+**Expected:** Leaderboard and stats update instantly, supports offline viewing.
+
 ### 1. Beginner Scenarios
 
 #### 1.1 Flutter Widget Integration
+
 **Use case:** Cache images/files in widgets for bandwidth savings and speed.
+
 ```dart
 import 'package:flutter/material.dart';
 import 'package:easy_cache_manager/easy_cache_manager.dart';
@@ -420,10 +522,13 @@ class CachedImageWidget extends StatelessWidget {
   }
 }
 ```
+
 **Expected:** Images load from cache if available, otherwise from network and then cached for next time.
 
 #### 1.2 REST API Integration
+
 **Use case:** Cache API responses to reduce repeated calls and speed up UX.
+
 ```dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -446,10 +551,13 @@ Future<Map<String, dynamic>> fetchUser(String id) async {
   return data;
 }
 ```
+
 **Expected:** User data is cached, reducing latency and network usage.
 
 #### 1.3 Error Handling
+
 **Use case:** Robust error handling for cache operations.
+
 ```dart
 try {
   final data = await cacheManager.getJson('key');
@@ -459,19 +567,25 @@ try {
   // Handle gracefully - app doesn't crash
 }
 ```
+
 **Expected:** App does not crash on cache errors.
 
 #### 1.4 Cache Invalidation
+
 **Use case:** Remove cache when data changes (e.g. user profile update).
+
 ```dart
 // When user updates profile
 await cacheManager.removeItem('user_profile');
 // Next fetch will get fresh data
 ```
+
 **Expected:** Cache is cleared and reloaded when data changes.
 
 #### 1.5 Manual Cache Management
+
 **Use case:** Full control over cache (remove, check, cleanup).
+
 ```dart
 // Check if data exists
 bool hasData = await cacheManager.contains('cache_key');
@@ -491,6 +605,7 @@ await cacheManager.cleanup();
 // Clear everything
 await cacheManager.clearCache();
 ```
+
 **Expected:** Complete manual control over cache lifecycle.
 
 ---
@@ -498,7 +613,9 @@ await cacheManager.clearCache();
 ### 2. Advanced Scenarios
 
 #### 2.1 TTL/Expiration per Key
+
 **Use case:** Different data types have different lifetimes (e.g. token 1hr, profile 1d)
+
 ```dart
 // Token expires in 1 hour
 await cacheManager.save('token', token, maxAge: const Duration(hours: 1));
@@ -506,10 +623,13 @@ await cacheManager.save('token', token, maxAge: const Duration(hours: 1));
 // Profile expires in 1 day
 await cacheManager.save('profile', profile, maxAge: const Duration(days: 1));
 ```
+
 **Expected:** Token expires faster than profile and is auto-removed.
 
 #### 2.2 Size-based Eviction
+
 **Use case:** Remove largest files first when space is low.
+
 ```dart
 final cacheManager = CacheManager(
   config: AdvancedCacheConfig.production(
@@ -517,10 +637,13 @@ final cacheManager = CacheManager(
   ),
 );
 ```
+
 **Expected:** Large files are evicted first when cache is full.
 
 #### 2.3 Composite Policy (LRU+TTL)
+
 **Use case:** Combine multiple eviction strategies for robust cache management.
+
 ```dart
 final cacheManager = CacheManager(
   config: AdvancedCacheConfig.production(),
@@ -532,15 +655,18 @@ final cacheManager = CacheManager(
   ),
 );
 ```
+
 **Expected:** Cache evicts by both age and usage.
 
 #### 2.4 Offline-first API
+
 **Use case:** Provide cached data when offline, fallback to network when online.
+
 ```dart
 Future<Map<String, dynamic>> fetchData(String key, String url) async {
   final cached = await cacheManager.getJson(key);
   if (cached != null) return cached;
-  
+
   try {
     final response = await http.get(Uri.parse(url));
     final data = jsonDecode(response.body);
@@ -552,10 +678,13 @@ Future<Map<String, dynamic>> fetchData(String key, String url) async {
   }
 }
 ```
+
 **Expected:** Users see last cached data even when offline.
 
 #### 2.5 Cache Warming
+
 **Use case:** Preload important data before app usage for instant UX.
+
 ```dart
 Future<void> warmCache() async {
   await Future.wait([
@@ -565,10 +694,13 @@ Future<void> warmCache() async {
   ]);
 }
 ```
+
 **Expected:** Key data is cached ahead of time, reducing latency.
 
 #### 2.6 Export Metrics
+
 **Use case:** Export cache stats for analysis/audit.
+
 ```dart
 final metrics = cacheManager.storage.analytics?.exportMetrics();
 print(jsonEncode(metrics));
@@ -579,10 +711,13 @@ print(jsonEncode(metrics));
 //   "evictionCount": 12
 // }
 ```
+
 **Expected:** Cache metrics available for reporting or dashboard.
 
 #### 2.7 Background Sync
+
 **Use case:** Sync cache with server automatically in background.
+
 ```dart
 final cacheManager = CacheManager(
   config: AdvancedCacheConfig.production(
@@ -591,10 +726,13 @@ final cacheManager = CacheManager(
   ),
 );
 ```
+
 **Expected:** Cache syncs with server every hour.
 
 #### 2.8 Encryption/Decryption
+
 **Use case:** Secure sensitive cache data (token, user info).
+
 ```dart
 final cacheManager = CacheManager(
   config: AdvancedCacheConfig.production(
@@ -603,10 +741,13 @@ final cacheManager = CacheManager(
   ),
 );
 ```
+
 **Expected:** Cache data is encrypted and safe.
 
 #### 2.9 GraphQL Caching
+
 **Use case:** Cache GraphQL query results for speed and efficiency.
+
 ```dart
 final cacheManager = CacheManager(
   config: AdvancedCacheConfig.production(),
@@ -621,10 +762,13 @@ if (cached == null) {
   await cacheManager.save(cacheKey, result.data);
 }
 ```
+
 **Expected:** GraphQL results are cached and reused.
 
 #### 2.10 Custom Data Type
+
 **Use case:** Cache binary, images, or custom model objects.
+
 ```dart
 // Cache image bytes
 await cacheManager.save('image_bytes', imageBytes);
@@ -635,10 +779,13 @@ final user = User(id: 1, name: 'John');
 await cacheManager.save('user_model', user.toJson());
 final cachedUser = User.fromJson(await cacheManager.getJson('user_model'));
 ```
+
 **Expected:** Cache supports all data types.
 
 #### 2.11 Multi-tenant Cache
+
 **Use case:** Separate cache for each tenant/user in SaaS apps.
+
 ```dart
 final cacheManager = CacheManager(
   config: AdvancedCacheConfig.production(
@@ -646,10 +793,13 @@ final cacheManager = CacheManager(
   ),
 );
 ```
+
 **Expected:** Cache is isolated per tenant/user.
 
 #### 2.12 Debugging/Tracing
+
 **Use case:** Trace cache flow for development/debugging.
+
 ```dart
 final cacheManager = CacheManager(
   config: AdvancedCacheConfig.production(
@@ -657,10 +807,13 @@ final cacheManager = CacheManager(
   ),
 );
 ```
+
 **Expected:** Cache logs all operations for debugging.
 
 #### 2.13 Real-time Statistics Monitoring
+
 **Use case:** Monitor cache stats/hit rate in real-time.
+
 ```dart
 cacheManager.statsStream.listen((stats) {
   print('Hit rate: ${stats.hitRate}%');
@@ -668,6 +821,7 @@ cacheManager.statsStream.listen((stats) {
   print('Memory usage: ${stats.totalSizeInMB.toStringAsFixed(2)} MB');
 });
 ```
+
 **Expected:** Instantly see cache stats and hit rate.
 
 ---
@@ -675,7 +829,9 @@ cacheManager.statsStream.listen((stats) {
 ### 3. Enterprise & Power User Scenarios
 
 #### 3.1 Custom Analytics Integration
+
 **Use case:** Send cache metrics/events to external systems (Firebase, Sentry, etc.)
+
 ```dart
 class MyAnalytics implements CacheAnalytics {
   @override
@@ -685,7 +841,7 @@ class MyAnalytics implements CacheAnalytics {
       name: event,
       parameters: details,
     );
-    
+
     // Send to Sentry for monitoring
     Sentry.addBreadcrumb(Breadcrumb(
       message: event,
@@ -709,16 +865,19 @@ final cacheManager = CacheManager(
   ),
 );
 ```
+
 **Expected:** Cache events/metrics are sent to your analytics system.
 
 #### 3.2 Integration with Analytics Dashboard
+
 **Use case:** Send cache metrics to external dashboard for monitoring.
+
 ```dart
 class DashboardAnalytics implements CacheAnalytics {
   final String dashboardUrl;
-  
+
   DashboardAnalytics(this.dashboardUrl);
-  
+
   @override
   void recordEvent(String event, Map<String, dynamic> details) async {
     await http.post(
@@ -731,7 +890,7 @@ class DashboardAnalytics implements CacheAnalytics {
       headers: {'Content-Type': 'application/json'},
     );
   }
-  
+
   @override
   Map<String, dynamic> exportMetrics() => {
     'service': 'easy_cache_manager',
@@ -747,10 +906,13 @@ final cacheManager = CacheManager(
   ),
 );
 ```
+
 **Expected:** Cache metrics are sent to your dashboard.
 
 #### 3.3 Platform-Specific Features
+
 **Use case:** Optimize cache for Web, Mobile, Desktop.
+
 ```dart
 CacheManager createPlatformOptimizedCache() {
   if (kIsWeb) {
@@ -774,21 +936,24 @@ CacheManager createPlatformOptimizedCache() {
   }
 }
 ```
+
 **Expected:** Cache manager auto-selects best storage/optimization for platform.
 
 #### 3.4 Custom Eviction Policy/Analytics
+
 **Use case:** Power users can implement custom logic (TTL per key, histogram, export metrics).
+
 ```dart
 class MyCustomPolicy implements EvictionPolicy {
   final int maxEntries;
   final Map<String, DateTime> _accessTimes = {};
-  
+
   MyCustomPolicy(this.maxEntries);
-  
+
   @override
   List<String> selectItemsToEvict(Map<String, CacheEntry> entries) {
     if (entries.length <= maxEntries) return [];
-    
+
     // Custom logic: evict items accessed more than 1 hour ago
     final cutoff = DateTime.now().subtract(const Duration(hours: 1));
     return entries.entries
@@ -800,23 +965,23 @@ class MyCustomPolicy implements EvictionPolicy {
 
 class MyAnalytics implements CacheAnalytics {
   final Map<String, int> _eventCounts = {};
-  
+
   @override
   void recordEvent(String event, Map<String, dynamic> details) {
     _eventCounts[event] = (_eventCounts[event] ?? 0) + 1;
-    
+
     // Export to CSV for analysis
     if (_eventCounts.values.fold(0, (a, b) => a + b) % 100 == 0) {
       _exportToCsv();
     }
   }
-  
+
   @override
   Map<String, dynamic> exportMetrics() => {
     'eventCounts': _eventCounts,
     'totalEvents': _eventCounts.values.fold(0, (a, b) => a + b),
   };
-  
+
   void _exportToCsv() {
     // Implementation for CSV export
   }
@@ -830,18 +995,21 @@ final cacheManager = CacheManager(
   ),
 );
 ```
+
 **Expected:** Custom eviction/analytics logic as required.
 
 #### 3.5 Benchmark & Performance Testing
+
 **Use case:** Developers/organizations can measure cache performance.
+
 ```dart
 void runPerformanceTest() async {
   final benchmark = CacheBenchmarkSuite(
     storage: HiveCacheStorage(),
   );
-  
+
   final results = await benchmark.runFullBenchmark();
-  
+
   print('Performance Results:');
   print('- Write Speed: ${results.writeSpeed}ms avg');
   print('- Read Speed: ${results.readSpeed}ms avg');
@@ -849,10 +1017,13 @@ void runPerformanceTest() async {
   print('- Hit Rate: ${results.hitRate}%');
 }
 ```
+
 **Expected:** Benchmark results for cache manager comparison.
 
 #### 3.6 State Management Integration (Riverpod/Bloc)
+
 **Use case:** Use cache manager with state management frameworks.
+
 ```dart
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -868,11 +1039,11 @@ final cacheManagerProvider = Provider((ref) => CacheManager(
 final userProvider = FutureProvider.family<User, String>((ref, userId) async {
   final cacheManager = ref.watch(cacheManagerProvider);
   final cached = await cacheManager.getJson('user_$userId');
-  
+
   if (cached != null) {
     return User.fromJson(cached);
   }
-  
+
   final user = await fetchUserFromApi(userId);
   await cacheManager.save('user_$userId', user.toJson());
   return user;
@@ -881,7 +1052,7 @@ final userProvider = FutureProvider.family<User, String>((ref, userId) async {
 // In Bloc
 class UserBloc extends Bloc<UserEvent, UserState> {
   final CacheManager cacheManager;
-  
+
   UserBloc(this.cacheManager) : super(UserInitial()) {
     on<FetchUserEvent>((event, emit) async {
       try {
@@ -890,7 +1061,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           emit(UserLoaded(User.fromJson(cached)));
           return;
         }
-        
+
         final user = await fetchUserFromApi(event.id);
         await cacheManager.save('user_${event.id}', user.toJson());
         emit(UserLoaded(user));
@@ -901,23 +1072,26 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   }
 }
 ```
+
 **Expected:** Seamless cache integration with state management.
 
 #### 3.7 Network Library Integration (Dio)
+
 **Use case:** Cache API responses with Dio or other network libraries.
+
 ```dart
 import 'package:dio/dio.dart';
 
 class CacheInterceptor extends Interceptor {
   final CacheManager cacheManager;
-  
+
   CacheInterceptor(this.cacheManager);
-  
+
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     final cacheKey = _generateCacheKey(options);
     final cached = await cacheManager.getJson(cacheKey);
-    
+
     if (cached != null && !_isExpired(cached)) {
       handler.resolve(Response(
         requestOptions: options,
@@ -926,10 +1100,10 @@ class CacheInterceptor extends Interceptor {
       ));
       return;
     }
-    
+
     super.onRequest(options, handler);
   }
-  
+
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) async {
     final cacheKey = _generateCacheKey(response.requestOptions);
@@ -937,14 +1111,14 @@ class CacheInterceptor extends Interceptor {
       'data': response.data,
       'timestamp': DateTime.now().toIso8601String(),
     });
-    
+
     super.onResponse(response, handler);
   }
-  
+
   String _generateCacheKey(RequestOptions options) {
     return '${options.method}_${options.uri}'.hashCode.toString();
   }
-  
+
   bool _isExpired(Map<String, dynamic> cached) {
     final timestamp = DateTime.parse(cached['timestamp']);
     return DateTime.now().difference(timestamp) > const Duration(hours: 1);
@@ -962,6 +1136,7 @@ final cacheManager = CacheManager(
 final dio = Dio();
 dio.interceptors.add(CacheInterceptor(cacheManager));
 ```
+
 **Expected:** API responses are cached, reducing repeated calls.
 
 ---
@@ -992,23 +1167,27 @@ API Cache Hit     25ms → 1ms         🚀 25x faster
 ## ✨ Key Features
 
 ### 🏎️ High-performance Storage
+
 - **Hive NoSQL Engine**: Lightning-fast NoSQL database
 - **Smart Memory Management**: Automatic small/large data optimization
 - **Zero-Copy Operations**: Direct binary access without serialization
 - **Cross-Platform Optimization**: Platform-specific performance tuning
 
 ### 🏗️ Multiple Complexity Levels
+
 - **Minimal Configuration**: Perfect for small projects and rapid prototyping
 - **Standard Configuration**: Balanced features for most applications
 - **Advanced Configuration**: Enterprise-level features with full customization
 
 ### 🌐 Cross-Platform Storage
+
 - **Web**: LocalStorage + Memory optimization
 - **Mobile**: Hive NoSQL + File System (iOS/Android)
 - **Desktop**: JSON Files + Memory caching (Windows/macOS/Linux)
 - **Automatic Platform Detection**: Seamless adaptation to runtime environment
 
 ### 🧠 Smart Eviction Policies
+
 - **LRU** (Least Recently Used): Remove oldest accessed items
 - **LFU** (Least Frequently Used): Remove least accessed items
 - **FIFO** (First In, First Out): Remove oldest created items
@@ -1017,6 +1196,7 @@ API Cache Hit     25ms → 1ms         🚀 25x faster
 - **Composite Policies**: Combine multiple strategies
 
 ### ⚡ Performance Optimizations
+
 - Data compression with multiple algorithms (GZIP, Deflate)
 - AES-256 encryption for sensitive data
 - Background sync capabilities
@@ -1024,12 +1204,14 @@ API Cache Hit     25ms → 1ms         🚀 25x faster
 - Memory-efficient streaming operations
 
 ### 📊 Comprehensive Analytics
+
 - Real-time cache statistics and hit rates
 - Storage usage monitoring
 - Performance metrics collection
 - Detailed debugging information
 
 ### 🎯 Developer Experience
+
 - Type-safe APIs with comprehensive error handling
 - RxDart streams for reactive programming
 - Flutter widgets for common use cases
@@ -1249,9 +1431,11 @@ cacheManager.statsStream.listen((stats) {
 ## 🔧 Eviction Policy & Analytics (Advanced)
 
 ### For Beginners
+
 EasyCacheManager handles cleanup/expiry automatically - no additional config needed.
 
 ### For Power Users
+
 You can choose policies like LRU, TTL, MaxEntries, or create custom ones:
 
 ```dart
@@ -1267,6 +1451,7 @@ final cacheManager = CacheManager(
 ```
 
 ### For Advanced Use Cases
+
 Create custom policies/analytics for TTL per key, histograms, metric export:
 
 ```dart
@@ -1288,6 +1473,7 @@ final cacheManager = CacheManager(
 ```
 
 ### View Metrics/Export
+
 ```dart
 final metrics = cacheManager.storage.analytics?.exportMetrics();
 print(metrics);
@@ -1296,6 +1482,7 @@ print(metrics);
 ## 🔗 Integration Examples
 
 ### State Management (Riverpod, Bloc)
+
 ```dart
 final cacheManagerProvider = Provider((ref) => CacheManager(
   config: AdvancedCacheConfig.production(),
@@ -1316,6 +1503,7 @@ class FetchUserEvent extends BlocEvent {
 ```
 
 ### Network Library (Dio)
+
 ```dart
 final cacheManager = CacheManager(
   config: AdvancedCacheConfig.production(),
@@ -1337,6 +1525,7 @@ await cacheManager.save('api_data', response.data);
 - Add comments explaining logic in tests and examples
 
 Example:
+
 ```dart
 // Use const Duration
 final map = {

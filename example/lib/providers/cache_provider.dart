@@ -1,65 +1,106 @@
 import 'package:flutter/foundation.dart';
 import 'package:easy_cache_manager/easy_cache_manager.dart';
 
-/// 🚀 Cache Provider for Centralized Cache Management
+/// 🚀 [CacheProvider] - Centralized, Reactive Cache Management for Flutter Apps
 ///
-/// Manages multiple cache configurations and provides reactive state
-/// management for cache operations throughout the application.
+/// This provider manages multiple cache configurations (Minimal, Standard, Advanced)
+/// and exposes a unified, reactive API for cache operations, statistics, and error handling.
 ///
-/// ## Features:
-/// - Multiple cache configurations (Minimal, Standard, Advanced)
-/// - Reactive cache statistics
-/// - Error handling and logging
-/// - Performance monitoring
-/// - Configuration switching
+/// ### Key Features
+/// - **Multiple Configurations:** Instantiates and manages minimal, standard, and advanced cache managers for different app needs.
+/// - **Reactive State:** Notifies listeners on cache/statistics changes for seamless UI updates.
+/// - **Performance Monitoring:** Periodically updates cache statistics for dashboards and analytics.
+/// - **Error Handling:** Captures and exposes last error for diagnostics and UI feedback.
+/// - **Configuration Switching:** Allows runtime switching between cache strategies.
+/// - **Resource Management:** Disposes all cache managers and resources cleanly.
+///
+/// ### Usage Example
+/// ```dart
+/// final provider = Provider.of<CacheProvider>(context);
+/// await provider.initialize();
+/// provider.switchConfiguration(CacheConfigurationType.advanced);
+/// await provider.currentCache.save('key', value);
+/// final stats = provider.statistics;
+/// ```
+///
+/// ### Best Practices
+/// - Use [switchConfiguration] to adapt cache strategy to user/device/app state.
+/// - Use [statistics] for real-time monitoring and UI feedback.
+/// - Always call [dispose] to release resources.
+///
+/// ### See Also
+/// - [CacheManager], [CacheStats], [CacheConfigurationType]
 class CacheProvider extends ChangeNotifier {
-  // Cache managers for different configurations
+  /// Internal cache managers for each configuration type
   CacheManager? _minimalCache;
   CacheManager? _standardCache;
   CacheManager? _advancedCache;
 
-  // Current configuration
+  /// Currently active cache configuration type
   CacheConfigurationType _currentConfiguration =
       CacheConfigurationType.standard;
 
-  // Statistics and state
+  /// Initialization state
   bool _isInitialized = false;
+
+  /// Last error message (if any)
   String? _lastError;
+
+  /// Latest cache statistics for current configuration
   CacheStats _statistics = CacheStats.empty();
 
-  // Getters
+  /// Returns the currently selected cache configuration type
   CacheConfigurationType get currentConfiguration => _currentConfiguration;
+
+  /// Returns true if all cache managers are initialized
   bool get isInitialized => _isInitialized;
+
+  /// Returns the last error message, if any
   String? get lastError => _lastError;
+
+  /// Returns the latest cache statistics for the current configuration
   CacheStats get statistics => _statistics;
 
-  /// Current active cache manager
+  /// Returns the current active [CacheManager] based on selected configuration
+  /// Throws if not initialized or configuration is missing
   CacheManager get currentCache {
     switch (_currentConfiguration) {
       case CacheConfigurationType.minimal:
+        if (_minimalCache == null) {
+          throw Exception('Minimal cache not initialized');
+        }
         return _minimalCache!;
       case CacheConfigurationType.standard:
+        if (_standardCache == null) {
+          throw Exception('Standard cache not initialized');
+        }
         return _standardCache!;
       case CacheConfigurationType.advanced:
+        if (_advancedCache == null) {
+          throw Exception('Advanced cache not initialized');
+        }
         return _advancedCache!;
     }
   }
 
-  /// Initialize all cache configurations
+  /// Initializes all cache managers for each configuration type.
+  ///
+  /// - Minimal: 25MB, fast, for small apps
+  /// - Standard: 200MB, balanced, for most apps
+  /// - Advanced: 500MB, enterprise, for large/complex apps
+  ///
+  /// Notifies listeners on completion or error.
   Future<void> initialize() async {
     try {
-      // Initialize Minimal Configuration (5-25MB)
       _minimalCache = CacheManager(
-        config: const CacheConfig(
+        config: const AdvancedCacheConfig(
           maxCacheSize: 25 * 1024 * 1024, // 25MB
           stalePeriod: Duration(hours: 2),
           enableLogging: true,
         ),
       );
-
-      // Initialize Standard Configuration (50-200MB)
       _standardCache = CacheManager(
-        config: const CacheConfig(
+        config: const AdvancedCacheConfig(
           maxCacheSize: 200 * 1024 * 1024, // 200MB
           stalePeriod: Duration(days: 1),
           maxAge: Duration(hours: 24),
@@ -69,10 +110,8 @@ class CacheProvider extends ChangeNotifier {
           enableLogging: true,
         ),
       );
-
-      // Initialize Advanced Configuration (500MB+)
       _advancedCache = CacheManager(
-        config: const CacheConfig(
+        config: const AdvancedCacheConfig(
           maxCacheSize: 500 * 1024 * 1024, // 500MB
           stalePeriod: Duration(days: 7),
           maxAge: Duration(days: 30),
@@ -82,13 +121,9 @@ class CacheProvider extends ChangeNotifier {
           enableLogging: true,
         ),
       );
-
       _isInitialized = true;
       _lastError = null;
-
-      // Start periodic statistics update
       _startStatisticsUpdater();
-
       notifyListeners();
     } catch (e) {
       _lastError = 'Failed to initialize cache: $e';
@@ -98,16 +133,19 @@ class CacheProvider extends ChangeNotifier {
     }
   }
 
-  /// Switch to a different cache configuration
+  /// Switches the active cache configuration at runtime.
+  ///
+  /// [type] - The configuration type to switch to.
+  /// Notifies listeners and updates statistics.
   Future<void> switchConfiguration(CacheConfigurationType type) async {
     if (_currentConfiguration == type || !_isInitialized) return;
-
     _currentConfiguration = type;
     await _updateStatistics();
     notifyListeners();
   }
 
-  /// Clear all caches
+  /// Clears all caches for every configuration type.
+  /// Notifies listeners and updates statistics.
   Future<void> clearAllCaches() async {
     try {
       await Future.wait([
@@ -115,7 +153,6 @@ class CacheProvider extends ChangeNotifier {
         if (_standardCache != null) _standardCache!.clearCache(),
         if (_advancedCache != null) _advancedCache!.clearCache(),
       ]);
-
       await _updateStatistics();
       _lastError = null;
       notifyListeners();
@@ -126,7 +163,8 @@ class CacheProvider extends ChangeNotifier {
     }
   }
 
-  /// Clear current cache
+  /// Clears the currently active cache only.
+  /// Notifies listeners and updates statistics.
   Future<void> clearCurrentCache() async {
     try {
       await currentCache.clearCache();
@@ -140,29 +178,26 @@ class CacheProvider extends ChangeNotifier {
     }
   }
 
-  /// Get cache statistics for all configurations
+  /// Returns cache statistics for all configuration types.
+  /// Useful for dashboards and analytics.
   Future<Map<String, CacheStats>> getAllStatistics() async {
     final stats = <String, CacheStats>{};
-
     if (_minimalCache != null) {
       stats['minimal'] = await _minimalCache!.getStats();
     }
-
     if (_standardCache != null) {
       stats['standard'] = await _standardCache!.getStats();
     }
-
     if (_advancedCache != null) {
       stats['advanced'] = await _advancedCache!.getStats();
     }
-
     return stats;
   }
 
-  /// Update statistics for current cache
+  /// Updates statistics for the current cache configuration.
+  /// Internal use only.
   Future<void> _updateStatistics() async {
     if (!_isInitialized) return;
-
     try {
       _statistics = await currentCache.getStats();
     } catch (e) {
@@ -170,9 +205,9 @@ class CacheProvider extends ChangeNotifier {
     }
   }
 
-  /// Start periodic statistics updater
+  /// Starts a periodic statistics updater (every 5 seconds).
+  /// Keeps [statistics] up-to-date for real-time monitoring.
   void _startStatisticsUpdater() {
-    // Update statistics every 5 seconds
     Future.delayed(const Duration(seconds: 5), () async {
       if (_isInitialized) {
         await _updateStatistics();
@@ -182,7 +217,8 @@ class CacheProvider extends ChangeNotifier {
     });
   }
 
-  /// Get cache manager by type
+  /// Returns the [CacheManager] for a given configuration type.
+  /// Returns null if not initialized.
   CacheManager? getCacheByType(CacheConfigurationType type) {
     switch (type) {
       case CacheConfigurationType.minimal:
@@ -194,7 +230,8 @@ class CacheProvider extends ChangeNotifier {
     }
   }
 
-  /// Dispose all resources
+  /// Disposes all cache managers and resources.
+  /// Always call this to prevent memory leaks.
   @override
   void dispose() {
     _minimalCache?.dispose();
@@ -204,14 +241,21 @@ class CacheProvider extends ChangeNotifier {
   }
 }
 
-/// Cache configuration types
+/// Cache configuration types for [CacheProvider]
+///
+/// - [minimal]: 5-25MB, for small apps and prototypes
+/// - [standard]: 50-200MB, for most production apps
+/// - [advanced]: 500MB+, for enterprise and data-heavy apps
 enum CacheConfigurationType {
   minimal('Minimal (5-25MB)', 'Perfect for small apps'),
   standard('Standard (50-200MB)', 'Balanced for most apps'),
   advanced('Advanced (500MB+)', 'Enterprise features');
 
-  const CacheConfigurationType(this.displayName, this.description);
-
+  /// Display name for UI
   final String displayName;
+
+  /// Description for documentation/UI
   final String description;
+
+  const CacheConfigurationType(this.displayName, this.description);
 }
