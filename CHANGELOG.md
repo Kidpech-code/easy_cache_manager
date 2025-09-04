@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2024-12-04 ⚡ Dependency Optimization Update
+
+### Fixed
+- **Dependency Constraints**: Tightened all dependency constraints for better pub.dev compatibility
+- **WASM Compatibility**: Enhanced Web platform support with optimized dependencies
+- **Static Analysis**: Resolved all remaining static analysis issues
+- **Generated Files**: Ensured all Hive TypeAdapters are properly committed and available
+
+### Changed  
+- Updated `rxdart` constraint to `>=0.28.0 <1.0.0` for better compatibility
+- Optimized 18 dependency constraints using `dart pub upgrade --tighten`
+- Enhanced Web platform support with `universal_io ^2.2.2` and `web ^1.1.1`
+
 ## [0.1.0] - 2024-12-04 🚀⚡ Initial Release - "The Performance Revolution"
 
 ### Added
