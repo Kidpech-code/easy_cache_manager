@@ -8,6 +8,9 @@
 
 library easy_cache_auto_config;
 
+import '../core/analytics/real_time_workload_detector.dart';
+import '../core/analytics/cache_analytics.dart';
+
 import '../presentation/cache_manager.dart';
 import '../domain/entities/cache_config.dart';
 import '../core/storage/simple_cache_storage.dart';
@@ -20,6 +23,9 @@ import '../core/network/network_info.dart';
 ///
 /// Automatically detects your app needs and chooses the best configuration
 class EasyCacheManager {
+  static RealTimeWorkloadDetector? _workloadDetector;
+  static SimpleCacheAnalytics? _analytics;
+
   /// Auto-detect and configure cache based on your app
   static CacheManager auto({
     int? expectedUsers,
@@ -27,7 +33,9 @@ class EasyCacheManager {
     String? platform,
     String? importance,
   }) {
-    return CacheManager(
+    _analytics ??= SimpleCacheAnalytics();
+    _workloadDetector ??= RealTimeWorkloadDetector(_analytics!);
+    final manager = CacheManager(
       config: _autoDetectConfig(
         expectedUsers: expectedUsers,
         dataTypes: dataTypes,
@@ -35,6 +43,9 @@ class EasyCacheManager {
         importance: importance,
       ),
     );
+    // Optionally, hook analytics into manager events here
+    // e.g. manager.onEvent = _analytics.recordEvent;
+    return manager;
   }
 
   /// Smart configuration with AI-powered recommendations
@@ -73,12 +84,12 @@ class EasyCacheManager {
   }
 
   static CacheConfig _autoDetectConfig({
+    // Optionally, use _workloadDetector.currentType to tune config
     int? expectedUsers,
     List<String>? dataTypes,
     String? platform,
     String? importance,
   }) {
-    // Simple auto-detection logic
     final hasImages = dataTypes?.contains('images') ?? false;
     final hasVideos = dataTypes?.contains('videos') ?? false;
     final isHighTraffic = (expectedUsers ?? 100) > 1000;
@@ -92,15 +103,55 @@ class EasyCacheManager {
       maxSize = 100 * 1024 * 1024; // 100MB for data
     }
 
+    // Real-time workload detection
+    WorkloadType? workloadType;
+    if (_workloadDetector != null) {
+      _workloadDetector!.update();
+      workloadType = _workloadDetector!.currentType;
+    }
+
+    // Auto-tune config based on workload
+    Duration stalePeriod = isHighTraffic ? const Duration(minutes: 15) : const Duration(hours: 1);
+    double cleanupThreshold = 0.8;
+    bool enableLogging = importance == 'high';
+
+    if (workloadType != null) {
+      switch (workloadType) {
+        case WorkloadType.readHeavy:
+          stalePeriod = const Duration(hours: 2);
+          cleanupThreshold = 0.85;
+          enableLogging = false;
+          break;
+        case WorkloadType.writeHeavy:
+          stalePeriod = const Duration(minutes: 10);
+          cleanupThreshold = 0.7;
+          enableLogging = true;
+          break;
+        case WorkloadType.burst:
+          stalePeriod = const Duration(minutes: 5);
+          cleanupThreshold = 0.6;
+          enableLogging = true;
+          break;
+        case WorkloadType.mixed:
+          stalePeriod = const Duration(hours: 1);
+          cleanupThreshold = 0.8;
+          enableLogging = importance == 'high';
+          break;
+        case WorkloadType.idle:
+          stalePeriod = const Duration(hours: 6);
+          cleanupThreshold = 0.95;
+          enableLogging = false;
+          break;
+      }
+    }
+
     return CacheConfig(
       maxCacheSize: maxSize,
-      stalePeriod: isHighTraffic
-          ? const Duration(minutes: 15)
-          : const Duration(hours: 1),
+      stalePeriod: stalePeriod,
       enableOfflineMode: true,
       autoCleanup: true,
-      cleanupThreshold: 0.8,
-      enableLogging: importance == 'high',
+      cleanupThreshold: cleanupThreshold,
+      enableLogging: enableLogging,
     );
   }
 
@@ -132,9 +183,7 @@ class EasyCacheManager {
 
     return CacheConfig(
       maxCacheSize: maxSize,
-      stalePeriod: expectedUsers > 1000
-          ? const Duration(minutes: 10)
-          : const Duration(hours: 2),
+      stalePeriod: expectedUsers > 1000 ? const Duration(minutes: 10) : const Duration(hours: 2),
       enableOfflineMode: true,
       autoCleanup: true,
       cleanupThreshold: platform == 'mobile' ? 0.8 : 0.9,
@@ -269,8 +318,7 @@ class SimpleCacheManager {
   /// Get cache manager instance (throws if not initialized)
   static CacheManager get instance {
     if (_instance == null) {
-      throw StateError(
-          'SimpleCacheManager not initialized! Call SimpleCacheManager.init() first');
+      throw StateError('SimpleCacheManager not initialized! Call SimpleCacheManager.init() first');
     }
     return _instance!;
   }
@@ -278,8 +326,7 @@ class SimpleCacheManager {
   /// Get simple storage instance (throws if not initialized)
   static SimpleCacheStorage get _storage {
     if (_simpleStorage == null) {
-      throw StateError(
-          'SimpleCacheManager not initialized! Call SimpleCacheManager.init() first');
+      throw StateError('SimpleCacheManager not initialized! Call SimpleCacheManager.init() first');
     }
     return _simpleStorage!;
   }
