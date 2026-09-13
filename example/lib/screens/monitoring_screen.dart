@@ -518,7 +518,7 @@ class _MonitoringScreenState extends State<MonitoringScreen>
                       ),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
-                        value: _selectedMetric,
+                        initialValue: _selectedMetric,
                         decoration: const InputDecoration(
                           border: OutlineInputBorder(),
                           contentPadding:

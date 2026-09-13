@@ -1,6 +1,6 @@
 import 'package:http/http.dart' as http;
-import 'network_info_native.dart'
-    if (dart.library.html) 'network_info_web.dart';
+import 'network_info_web.dart'
+    if (dart.library.io) 'network_info_native_impl.dart';
 
 /// Network connectivity checker
 abstract class NetworkInfo {

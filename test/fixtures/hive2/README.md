@@ -1,0 +1,1 @@
+Synthetic fixture written with Hive 2.2.3 before the Hive CE migration. Contains no user data. The compatibility test copies it to a temporary directory before opening it. Original type IDs and field IDs are retained.

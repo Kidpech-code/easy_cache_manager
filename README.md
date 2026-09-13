@@ -1,3 +1,7 @@
+> **Upgrading to 0.2.0:** Read [MIGRATION.md](MIGRATION.md). This release uses Hive CE
+> for JavaScript and WASM persistence and requires Dart >=3.4 / Flutter >=3.27.
+> Applications using Hive types or adapter registration directly must update imports.
+
 # 🚀⚡ Easy Cache Manager
 
 **Version: 0.1.8**
@@ -70,7 +74,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  easy_cache_manager: ^0.1.8
+  easy_cache_manager: ^0.2.0
 ```
 
 Run:
@@ -1276,7 +1280,7 @@ Add to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  easy_cache_manager: ^0.1.8
+  easy_cache_manager: ^0.2.0
 ```
 
 ### 2. Basic Usage (Minimal Configuration)

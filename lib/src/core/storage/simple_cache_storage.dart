@@ -6,11 +6,10 @@
 library simple_cache_storage;
 
 import 'dart:convert';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive_ce_flutter/hive_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:async';
-// Conditional import for Directory (native only)
-import 'dart:io' if (dart.library.html) 'dart:html';
+import 'native_storage_adapter.dart';
 
 // This module uses path_provider conditionally for native platforms
 import 'web_path_provider.dart' // Web-compatible path provider
@@ -104,10 +103,10 @@ class SimpleCacheStorage implements SimpleCacheStorageInterface {
             hiveInitialized = true;
           } catch (_) {}
         }
-        // Try Directory.systemTemp.path as last fallback
+        // Try NativeStorageAdapter.systemTempPath as last fallback
         if (!hiveInitialized) {
           try {
-            Hive.init(Directory.systemTemp.path);
+            Hive.init(NativeStorageAdapter.systemTempPath);
             hiveInitialized = true;
           } catch (systemTempError) {
             if (kDebugMode) {
@@ -139,15 +138,6 @@ class SimpleCacheStorage implements SimpleCacheStorageInterface {
     _ensureInitialized();
     try {
       final jsonString = jsonEncode(data);
-      // If both fail, fallback to Directory.systemTemp.path (native only)
-      try {
-        Hive.init(Directory.systemTemp.path);
-      } catch (systemTempError) {
-        if (kDebugMode) {
-          debugPrint(
-              'SimpleCacheStorage: systemTemp fallback failed: $systemTempError');
-        }
-      }
       await _box!.put('json_$key', jsonString);
     } catch (e) {
       throw Exception('Failed to store JSON data for key "$key": $e');

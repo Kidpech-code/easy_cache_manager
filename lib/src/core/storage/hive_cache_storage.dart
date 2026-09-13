@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'dart:io' if (dart.library.html) 'dart:html';
-import 'package:hive_flutter/hive_flutter.dart';
-// import 'package:hive/hive.dart' as hive_core; // Removed unused import
+import 'package:hive_ce_flutter/hive_flutter.dart';
+// import 'package:hive_ce/hive.dart' as hive_core; // Removed unused import
 // Removed universal_io/io.dart for WASM/Web compatibility
 import '../../domain/entities/cache_entry.dart';
 import '../../domain/entities/cache_stats.dart';
@@ -11,8 +10,7 @@ import '../../data/models/hive_cache_stats.dart';
 import '../policies/eviction_policy.dart';
 import '../analytics/cache_analytics.dart';
 import 'platform_cache_storage.dart';
-import 'native_storage_adapter.dart'
-    if (dart.library.html) 'web_path_provider_stub.dart';
+import 'native_storage_adapter.dart';
 
 /// High-performance Hive-based cache storage
 ///
@@ -90,7 +88,7 @@ class HiveCacheStorage implements PlatformCacheStorage {
       } catch (e) {
         // Fallback: use Hive.init with system temp directory for test environments
         try {
-          Hive.init(Directory.systemTemp.path);
+          Hive.init(NativeStorageAdapter.systemTempPath);
         } catch (e2) {
           throw Exception(
               'Hive initialization failed: $e, fallback failed: $e2');
