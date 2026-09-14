@@ -1,4 +1,4 @@
-import 'package:hive/hive.dart';
+import 'package:hive_ce/hive.dart';
 import '../../domain/entities/cache_stats.dart';
 
 part 'hive_cache_stats.g.dart';

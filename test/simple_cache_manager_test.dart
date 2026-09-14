@@ -4,16 +4,36 @@ library;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:easy_cache_manager/easy_cache_manager.dart';
 import 'package:easy_cache_manager/src/data/datasources/network_remote_data_source.dart';
-import 'mocks/mock_hive_cache_storage.dart';
+import 'dart:io';
+import 'package:hive_ce/hive.dart';
+import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:http/http.dart' as http;
 import 'dart:typed_data';
 import 'dart:convert';
 
+class _TestPathProvider extends PathProviderPlatform {
+  _TestPathProvider(this.path);
+  final String path;
+  @override
+  Future<String?> getApplicationDocumentsPath() async => path;
+  @override
+  Future<String?> getApplicationCachePath() async => path;
+  @override
+  Future<String?> getTemporaryPath() async => path;
+}
+
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  late Directory testDirectory;
+  late PathProviderPlatform originalPathProvider;
+  late CacheManager manager;
   group('SimpleCacheManager Complete Implementation Tests', () {
     setUp(() async {
-      // Initialize with mocked dependencies to avoid plugin/timeouts in tests
-      final mockHive = MockHiveCacheStorage();
+      testDirectory =
+          await Directory.systemTemp.createTemp('simple_cache_test_');
+      originalPathProvider = PathProviderPlatform.instance;
+      PathProviderPlatform.instance = _TestPathProvider(testDirectory.path);
+      final mockHive = HiveCacheStorage();
 
       // Lightweight fake HTTP client with pre-programmed responses
       final fakeClient = _FakeHttpClient(
@@ -37,6 +57,8 @@ void main() {
         remoteDataSource: mockRemote,
         networkInfo: alwaysConnected,
       );
+      manager = SimpleCacheManager.instance;
+      await manager.getStats();
     });
 
     tearDown(() async {
@@ -44,9 +66,24 @@ void main() {
       try {
         await SimpleCacheManager.clearAll();
         await SimpleCacheManager.close();
-      } catch (e) {
-        // Ignore cleanup errors
+      } on StateError {
+        // The uninitialized-state test already closed the manager.
+      } finally {
+        manager.dispose();
+        await Hive.close();
+        PathProviderPlatform.instance = originalPathProvider;
+        await testDirectory.delete(recursive: true);
       }
+    });
+
+    test('JSON writes preserve the directory used by subsequently opened boxes',
+        () async {
+      await SimpleCacheManager.saveJson('directory-check', {'value': 1});
+      final probe = await Hive.openBox<dynamic>('directory_probe');
+      await probe.put('value', 1);
+      await probe.close();
+      expect(File('${testDirectory.path}/directory_probe.hive').existsSync(),
+          isTrue);
     });
 
     group('Key-Value Storage Tests', () {
@@ -231,12 +268,16 @@ void main() {
         final mockRemote = NetworkRemoteDataSourceImpl(client: fakeClient);
 
         // Re-init with mocked byte client and connected network info
+        manager.dispose();
         await SimpleCacheManager.close();
+        await Hive.close();
         await SimpleCacheManager.init(
-          hiveCacheStorage: MockHiveCacheStorage(),
+          hiveCacheStorage: HiveCacheStorage(),
           remoteDataSource: mockRemote,
           networkInfo: _AlwaysConnectedNetworkInfo(),
         );
+        manager = SimpleCacheManager.instance;
+        await manager.getStats();
 
         await SimpleCacheManager.cacheImage('https://example.com/image.jpg');
         final img =

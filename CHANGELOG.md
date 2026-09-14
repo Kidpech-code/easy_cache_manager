@@ -1,3 +1,22 @@
+## 0.2.0 - 2026-09-14
+
+### Breaking changes
+- Replace Hive 2 with Hive CE for working JavaScript/WASM persistence. Direct
+  Hive imports and adapter registration must migrate; storage box/type/field
+  identifiers remain unchanged. See MIGRATION.md.
+- Require Dart >=3.4.0 and Flutter >=3.27.0.
+
+### Fixed
+- Select native network/storage implementations only when dart.library.io is
+  available; remove unsupported dart:html/dart:io imports from shared storage.
+- Stop JSON writes from resetting the global Hive storage directory.
+- Resolve development dependencies on modern Dart and replace a missing test
+  mock with isolated real storage tests.
+- Make the example web-buildable, remove unused dependencies/missing assets,
+  and update its deprecated form API.
+- Add native legacy-data compatibility tests, JavaScript/WASM browser storage
+  tests, and CI release-build checks.
+
 # Changelog
 
 All notable changes to this project will be documented in this file.

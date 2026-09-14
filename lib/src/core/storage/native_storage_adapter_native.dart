@@ -3,6 +3,8 @@ import 'package:path_provider/path_provider.dart';
 
 /// Native (mobile/desktop) storage adapter
 class NativeStorageAdapter {
+  static String get systemTempPath => Directory.systemTemp.path;
+
   static Future<String> getDocumentsDirectory() async {
     final directory = await getApplicationDocumentsDirectory();
     return directory.path;
