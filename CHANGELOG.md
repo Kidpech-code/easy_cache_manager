@@ -1,4 +1,4 @@
-## 0.2.0 - Unreleased
+## 0.2.0 - 2026-09-14
 
 ### Breaking changes
 - Replace Hive 2 with Hive CE for working JavaScript/WASM persistence. Direct
