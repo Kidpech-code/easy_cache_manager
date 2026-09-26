@@ -7,8 +7,8 @@
 ///
 /// ## Default Configuration:
 /// - **Maximum cache size**: 100MB
-/// - **Stale period**: 7 days (when data is considered stale)
-/// - **Maximum age**: 24 hours (when data expires completely)
+/// - **Maximum age**: 24 hours of fresh HTTP data
+/// - **Stale period**: 7 additional days for offline/error fallback
 /// - **Offline mode**: Enabled (fallback to cached data when offline)
 /// - **Auto cleanup**: Enabled (automatic cleanup when cache is 80% full)
 /// - **Maximum entries**: 1000 items
@@ -51,22 +51,22 @@ class CacheConfig {
   /// but use more storage space.
   final int maxCacheSize;
 
-  /// Duration after which cached data is considered stale but still usable
+  /// Additional time to retain HTTP responses after [maxAge]
   ///
-  /// Stale data can still be returned to users while being refreshed in the
-  /// background. This provides a balance between freshness and performance.
+  /// During this period, stale data is used only when offline or when a
+  /// network request fails. Afterward the entry is removed.
   final Duration stalePeriod;
 
-  /// Maximum age before cached data expires and must be refetched
+  /// Duration for which an HTTP response is fresh
   ///
-  /// After this duration, cached data is completely invalid and fresh data
-  /// must be fetched from the source. Should be longer than [stalePeriod].
+  /// After this duration, the manager refetches when online. It can use the
+  /// previous response for another [stalePeriod] when offline or on error.
   final Duration maxAge;
 
   /// Whether to enable offline mode with cached data fallback
   ///
-  /// When enabled, the cache manager will return cached data even if it's
-  /// expired when no network connection is available.
+  /// When enabled, the manager can return stale HTTP data within the
+  /// configured [stalePeriod] when no network connection is available.
   final bool enableOfflineMode;
 
   /// Whether to automatically clean up expired and excess cache entries
@@ -81,10 +81,10 @@ class CacheConfig {
   /// will be performed. Lower values clean more aggressively.
   final double cleanupThreshold;
 
-  /// Name identifier for the cache storage
+  /// Logical name for this cache configuration.
   ///
-  /// Used to separate different cache instances. Change this if you need
-  /// multiple independent caches in the same application.
+  /// Hive storage currently uses fixed box names, so this value does not
+  /// isolate stored data between [CacheConfig] instances.
   final String cacheName;
 
   /// Whether to enable detailed logging for debugging

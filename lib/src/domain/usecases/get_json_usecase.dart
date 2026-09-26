@@ -1,8 +1,10 @@
 import '../entities/cache_config.dart';
+import '../entities/cache_entry.dart';
 import '../repositories/cache_repository.dart';
 import '../repositories/network_repository.dart';
 import '../../core/error/failures.dart';
 import '../../core/network/network_info.dart';
+import '../../core/utils/cache_utils.dart';
 
 /// Result wrapper for use case operations
 class CacheResult<T> {
@@ -49,14 +51,23 @@ class GetJsonUseCase {
       Map<String, String>? headers,
       bool forceRefresh = false}) async {
     final startTime = DateTime.now();
-    final cacheKey = _generateCacheKey(url, headers);
+    final cacheKey = CacheUtils.generateRequestCacheKey('json', url, headers);
+    final effectiveMaxAge = maxAge ?? config.maxAge;
 
     try {
+      if (headers?.isNotEmpty == true) {
+        final legacyKey = 'json_$url';
+        final legacyEntry = await cacheRepository.retrieve(legacyKey);
+        if (legacyEntry?.headers?.isNotEmpty == true) {
+          await cacheRepository.remove(legacyKey);
+        }
+      }
+
       // Check cache first (unless force refresh)
       if (!forceRefresh) {
-        final cachedEntry = await cacheRepository.retrieve(cacheKey);
+        final cachedEntry =
+            await _retrieveSafeEntry(cacheKey, headers, effectiveMaxAge);
         if (cachedEntry != null) {
-          final effectiveMaxAge = maxAge ?? config.maxAge;
           if (cachedEntry.createdAt
               .add(effectiveMaxAge)
               .isAfter(DateTime.now())) {
@@ -71,7 +82,8 @@ class GetJsonUseCase {
       final isConnected = await networkInfo.isConnected;
       if (!isConnected && config.enableOfflineMode) {
         // Try to serve stale data if offline
-        final cachedEntry = await cacheRepository.retrieve(cacheKey);
+        final cachedEntry =
+            await _retrieveSafeEntry(cacheKey, headers, effectiveMaxAge);
         if (cachedEntry != null) {
           final loadTime = DateTime.now().difference(startTime);
           return CacheResult.success(cachedEntry.data as Map<String, dynamic>,
@@ -85,8 +97,7 @@ class GetJsonUseCase {
 
       // Cache the result
       await cacheRepository.store(cacheKey, data,
-          maxAge: maxAge ?? config.maxAge,
-          headers: headers,
+          maxAge: effectiveMaxAge + config.stalePeriod,
           contentType: 'application/json');
 
       final loadTime = DateTime.now().difference(startTime);
@@ -94,7 +105,8 @@ class GetJsonUseCase {
     } catch (e) {
       // Try to serve stale data on error
       if (config.enableOfflineMode) {
-        final cachedEntry = await cacheRepository.retrieve(cacheKey);
+        final cachedEntry =
+            await _retrieveSafeEntry(cacheKey, headers, effectiveMaxAge);
         if (cachedEntry != null) {
           final loadTime = DateTime.now().difference(startTime);
           return CacheResult.success(cachedEntry.data as Map<String, dynamic>,
@@ -107,8 +119,22 @@ class GetJsonUseCase {
     }
   }
 
-  String _generateCacheKey(String url, Map<String, String>? headers) {
-    // Simple cache key generation - in real implementation, consider headers
-    return 'json_$url';
+  Future<CacheEntry?> _retrieveSafeEntry(String cacheKey,
+      Map<String, String>? requestHeaders, Duration effectiveMaxAge) async {
+    final entry = await cacheRepository.retrieve(cacheKey);
+    if ((requestHeaders == null || requestHeaders.isEmpty) &&
+        entry?.headers?.isNotEmpty == true) {
+      // Earlier versions used this URL-only key for authenticated responses.
+      await cacheRepository.remove(cacheKey);
+      return null;
+    }
+    if (entry != null &&
+        !entry.createdAt
+            .add(effectiveMaxAge + config.stalePeriod)
+            .isAfter(DateTime.now())) {
+      await cacheRepository.remove(cacheKey);
+      return null;
+    }
+    return entry;
   }
 }

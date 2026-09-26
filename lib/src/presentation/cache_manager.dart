@@ -67,6 +67,7 @@ class CacheManager {
   late final GetJsonUseCase _getJsonUseCase;
   late final GetBytesUseCase _getBytesUseCase;
   late final CacheManagementUseCase _cacheManagementUseCase;
+  late final Future<void> _ready;
 
   /// The cache configuration used by this manager
   final CacheConfig config;
@@ -107,6 +108,7 @@ class CacheManager {
   /// Save data to cache (JSON or bytes)
   Future<void> save(String key, dynamic value, {Duration? maxAge}) async {
     try {
+      await _ready;
       if (value is Map<String, dynamic>) {
         await _cacheManagementUseCase.saveJson(key, value, maxAge: maxAge);
       } else if (value is Uint8List) {
@@ -136,6 +138,7 @@ class CacheManager {
       NetworkRemoteDataSource? remoteDataSource, NetworkInfo? networkInfo) {
     // Initialize dependencies with blazing-fast Hive storage
     final hiveStorage = hiveCacheStorage ?? HiveCacheStorage();
+    _ready = hiveStorage.initialize();
     final remoteDS = remoteDataSource ?? NetworkRemoteDataSourceImpl();
     final netInfo = networkInfo ?? NetworkInfoImpl();
 
@@ -163,13 +166,24 @@ class CacheManager {
       _setupAutoCleanup();
     }
 
-    // Initialize stats
-    _updateStats();
+    unawaited(_markReady());
+  }
 
-    _statusController.add(CacheStatusInfo(
-        status: CacheStatus.cached,
-        message: 'Cache manager ready',
-        timestamp: DateTime.now()));
+  Future<void> _markReady() async {
+    try {
+      await _ready;
+      await _updateStats();
+      if (_statusController.isClosed) return;
+      _statusController.add(CacheStatusInfo(
+          status: CacheStatus.cached,
+          message: 'Cache manager ready',
+          timestamp: DateTime.now()));
+    } catch (e) {
+      if (!_statusController.isClosed) {
+        _statusController.add(
+            CacheStatusInfo.error(message: 'Failed to initialize cache: $e'));
+      }
+    }
   }
 
   /// Fetch JSON data with caching
@@ -180,6 +194,7 @@ class CacheManager {
     _statusController.add(CacheStatusInfo.loading(key: url));
 
     try {
+      await _ready;
       final result = await _getJsonUseCase.execute(url,
           maxAge: maxAge, headers: headers, forceRefresh: forceRefresh);
 
@@ -219,6 +234,7 @@ class CacheManager {
     _statusController.add(CacheStatusInfo.loading(key: url));
 
     try {
+      await _ready;
       final result = await _getBytesUseCase.execute(url,
           maxAge: maxAge, headers: headers, forceRefresh: forceRefresh);
 
@@ -253,6 +269,7 @@ class CacheManager {
   /// Clear all cached data
   Future<void> clearCache() async {
     try {
+      await _ready;
       await _cacheManagementUseCase.clearCache();
       await _updateStats();
 
@@ -270,6 +287,7 @@ class CacheManager {
   /// Remove specific cached item
   Future<void> removeItem(String key) async {
     try {
+      await _ready;
       await _cacheManagementUseCase.removeItem(key);
       await _updateStats();
     } catch (e) {
@@ -282,6 +300,7 @@ class CacheManager {
   /// Check if cache contains specific key
   Future<bool> contains(String key) async {
     try {
+      await _ready;
       return await _cacheManagementUseCase.contains(key);
     } catch (e) {
       return false;
@@ -291,6 +310,7 @@ class CacheManager {
   /// Get all cache keys
   Future<List<String>> getAllKeys() async {
     try {
+      await _ready;
       return await _cacheManagementUseCase.getAllKeys();
     } catch (e) {
       return [];
@@ -300,6 +320,7 @@ class CacheManager {
   /// Manual cleanup of expired entries
   Future<void> cleanup() async {
     try {
+      await _ready;
       await _cacheManagementUseCase.cleanup();
       await _updateStats();
 
@@ -317,6 +338,7 @@ class CacheManager {
   /// Get cache statistics
   Future<CacheStats> getStats() async {
     try {
+      await _ready;
       return await _cacheManagementUseCase.getStats();
     } catch (e) {
       return CacheStats.empty();
@@ -344,7 +366,7 @@ class CacheManager {
   Future<void> _updateStats() async {
     try {
       final stats = await getStats();
-      _statsController.add(stats);
+      if (!_statsController.isClosed) _statsController.add(stats);
     } catch (e) {
       // Ignore stats update errors
     }

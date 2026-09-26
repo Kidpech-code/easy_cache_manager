@@ -21,6 +21,10 @@ import 'native_storage_adapter.dart';
 /// - Good memory efficiency
 /// - Cross-platform support (Web, Mobile, Desktop)
 class HiveCacheStorage implements PlatformCacheStorage {
+  static Future<void>? _sharedInitialization;
+  static Future<void>? _sharedClosing;
+  static int _attachedInstances = 0;
+
   final EvictionPolicy? evictionPolicy;
   final CacheAnalytics? analytics;
 
@@ -41,6 +45,7 @@ class HiveCacheStorage implements PlatformCacheStorage {
   String? _cacheDirectory;
 
   HiveCacheStats? _stats;
+  Future<void>? _initialization;
 
   @override
   bool get isSupported => true; // Hive supports all platforms
@@ -49,29 +54,49 @@ class HiveCacheStorage implements PlatformCacheStorage {
   String get storageType => 'Hive NoSQL (High-Performance)';
 
   @override
-  Future<void> initialize() async {
+  Future<void> initialize() => _initialization ??= _attach();
+
+  Future<void> _attach() async {
+    _attachedInstances++;
     try {
-      // Initialize Hive
-      if (!Hive.isBoxOpen(_cacheBoxName)) {
-        await _initializeHive();
-
-        // Open boxes
-        _cacheBox = await Hive.openBox<HiveCacheEntry>(_cacheBoxName);
-        _statsBox = await Hive.openBox<HiveCacheStats>(_statsBoxName);
-        _binaryBox = await Hive.openBox<Uint8List>(_binaryBoxName);
-
-        // Initialize or load stats
-        _stats = _statsBox!.get('main') ?? HiveCacheStats();
-        await _statsBox!.put('main', _stats!);
-
-        // Initialize file storage directory for large binaries
-        await _initializeCacheDirectory();
+      if (_sharedClosing != null) await _sharedClosing;
+      if (_sharedInitialization != null) await _sharedInitialization;
+      if (!Hive.isBoxOpen(_cacheBoxName) ||
+          !Hive.isBoxOpen(_statsBoxName) ||
+          !Hive.isBoxOpen(_binaryBoxName)) {
+        _sharedInitialization = _openSharedBoxes();
+        await _sharedInitialization;
       }
+      _cacheBox = Hive.box<HiveCacheEntry>(_cacheBoxName);
+      _statsBox = Hive.box<HiveCacheStats>(_statsBoxName);
+      _binaryBox = Hive.box<Uint8List>(_binaryBoxName);
+      _stats = _statsBox!.get('main');
+      await _initializeCacheDirectory();
     } catch (e) {
+      _attachedInstances--;
+      _initialization = null;
+      if (_attachedInstances == 0) _sharedInitialization = null;
       if (loggingEnabled && kDebugMode) {
         debugPrint('HiveCacheStorage: Failed to initialize: $e');
       }
       rethrow;
+    }
+  }
+
+  Future<void> _openSharedBoxes() async {
+    if (!Hive.isBoxOpen(_cacheBoxName)) await _initializeHive();
+    if (!Hive.isBoxOpen(_cacheBoxName)) {
+      await Hive.openBox<HiveCacheEntry>(_cacheBoxName);
+    }
+    if (!Hive.isBoxOpen(_statsBoxName)) {
+      await Hive.openBox<HiveCacheStats>(_statsBoxName);
+    }
+    if (!Hive.isBoxOpen(_binaryBoxName)) {
+      await Hive.openBox<Uint8List>(_binaryBoxName);
+    }
+    final statsBox = Hive.box<HiveCacheStats>(_statsBoxName);
+    if (statsBox.get('main') == null) {
+      await statsBox.put('main', HiveCacheStats());
     }
   }
 
@@ -119,6 +144,7 @@ class HiveCacheStorage implements PlatformCacheStorage {
   @override
   Future<void> store(
       String key, dynamic data, Map<String, dynamic> metadata) async {
+    _requireOpenBoxes();
     try {
       final now = DateTime.now();
       final entryCount = _cacheBox?.length ?? 0;
@@ -144,7 +170,9 @@ class HiveCacheStorage implements PlatformCacheStorage {
             metadata['created_at'] ?? now.millisecondsSinceEpoch),
         expiresAt: metadata['expires_at'] != null
             ? DateTime.fromMillisecondsSinceEpoch(metadata['expires_at'])
-            : null,
+            : metadata['maxAge'] != null
+                ? now.add(Duration(milliseconds: metadata['maxAge'] as int))
+                : null,
         headers: metadata['headers'] != null
             ? Map<String, String>.from(metadata['headers'])
             : null,
@@ -173,12 +201,14 @@ class HiveCacheStorage implements PlatformCacheStorage {
       if (loggingEnabled && kDebugMode) {
         debugPrint('HiveCacheStorage: Failed to store $key: $e');
       }
+      rethrow;
     }
   }
 
   @override
   Future<void> storeBytes(
       String key, Uint8List bytes, Map<String, dynamic> metadata) async {
+    _requireOpenBoxes();
     try {
       final now = DateTime.now();
       String? filePath;
@@ -206,7 +236,9 @@ class HiveCacheStorage implements PlatformCacheStorage {
             metadata['created_at'] ?? now.millisecondsSinceEpoch),
         expiresAt: metadata['expires_at'] != null
             ? DateTime.fromMillisecondsSinceEpoch(metadata['expires_at'])
-            : null,
+            : metadata['maxAge'] != null
+                ? now.add(Duration(milliseconds: metadata['maxAge'] as int))
+                : null,
         headers: metadata['headers'] != null
             ? Map<String, String>.from(metadata['headers'])
             : null,
@@ -228,6 +260,15 @@ class HiveCacheStorage implements PlatformCacheStorage {
       if (loggingEnabled && kDebugMode) {
         debugPrint('HiveCacheStorage: Failed to store bytes $key: $e');
       }
+      rethrow;
+    }
+  }
+
+  void _requireOpenBoxes() {
+    if (_cacheBox?.isOpen != true ||
+        _statsBox?.isOpen != true ||
+        _binaryBox?.isOpen != true) {
+      throw StateError('HiveCacheStorage is not initialized or is closed.');
     }
   }
 
@@ -492,14 +533,28 @@ class HiveCacheStorage implements PlatformCacheStorage {
   @override
   Future<void> dispose() async {
     try {
-      await _cacheBox?.close();
-      await _statsBox?.close();
-      await _binaryBox?.close();
-
+      if (_initialization != null) await _initialization;
+      if (_cacheBox == null) return;
+      _attachedInstances--;
+      if (_attachedInstances == 0) {
+        final closing = Future.wait([
+          if (_cacheBox!.isOpen) _cacheBox!.close(),
+          if (_statsBox!.isOpen) _statsBox!.close(),
+          if (_binaryBox!.isOpen) _binaryBox!.close(),
+        ]);
+        _sharedClosing = closing;
+        try {
+          await closing;
+        } finally {
+          _sharedInitialization = null;
+          _sharedClosing = null;
+        }
+      }
       _cacheBox = null;
       _statsBox = null;
       _binaryBox = null;
       _stats = null;
+      _initialization = null;
     } catch (e) {
       if (loggingEnabled && kDebugMode) {
         debugPrint('HiveCacheStorage: Failed to dispose: $e');

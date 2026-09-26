@@ -208,11 +208,11 @@ final maxCacheSize = (estimatedSize * 1.5).round(); // เผื่อไว้ 
 ### ⏰ **stalePeriod vs maxAge**
 
 ```dart
-// stalePeriod: ข้อมูลจะถูกลบออกจาก cache เมื่อไหร
-stalePeriod: Duration(days: 7),    // ลบทิ้งหลัง 7 วัน
+// maxAge: ช่วงที่ HTTP cache ยังสด
+maxAge: Duration(hours: 1),
 
-// maxAge: ข้อมูลจะ "เก่า" เมื่อไหร (แต่ยังใช้งานได้)
-maxAge: Duration(hours: 1),        // ถือว่าเก่าหลัง 1 ชม. (แต่ยังใช้ได้)
+// stalePeriod: เก็บต่อหลังหมดช่วงสดเพื่อใช้เมื่อ offline หรือ request ล้มเหลว
+stalePeriod: Duration(days: 7),
 ```
 
 **กรณีตัวอย่าง**:

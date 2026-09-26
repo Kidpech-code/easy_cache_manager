@@ -1,9 +1,11 @@
 import 'dart:typed_data';
 import '../entities/cache_config.dart';
+import '../entities/cache_entry.dart';
 import '../repositories/cache_repository.dart';
 import '../repositories/network_repository.dart';
 import '../../core/error/failures.dart';
 import '../../core/network/network_info.dart';
+import '../../core/utils/cache_utils.dart';
 
 /// Result wrapper for use case operations
 class BytesResult {
@@ -50,23 +52,31 @@ class GetBytesUseCase {
       Map<String, String>? headers,
       bool forceRefresh = false}) async {
     final startTime = DateTime.now();
-    final cacheKey = _generateCacheKey(url, headers);
+    final cacheKey = CacheUtils.generateRequestCacheKey('bytes', url, headers);
+    final effectiveMaxAge = maxAge ?? config.maxAge;
 
     try {
+      if (headers?.isNotEmpty == true) {
+        final legacyKey = 'bytes_$url';
+        final legacyEntry = await cacheRepository.retrieve(legacyKey);
+        if (legacyEntry?.headers?.isNotEmpty == true) {
+          await cacheRepository.remove(legacyKey);
+        }
+      }
+
       // Check cache first (unless force refresh)
       if (!forceRefresh) {
-        final cachedBytes = await cacheRepository.retrieveBytes(cacheKey);
-        if (cachedBytes != null) {
-          final cachedEntry = await cacheRepository.retrieve(cacheKey);
-          if (cachedEntry != null) {
-            final effectiveMaxAge = maxAge ?? config.maxAge;
-            if (cachedEntry.createdAt
-                .add(effectiveMaxAge)
-                .isAfter(DateTime.now())) {
-              final loadTime = DateTime.now().difference(startTime);
-              return BytesResult.success(cachedBytes,
-                  isFromCache: true, loadTime: loadTime);
-            }
+        final cachedEntry =
+            await _retrieveSafeEntry(cacheKey, headers, effectiveMaxAge);
+        if (cachedEntry != null) {
+          final cachedBytes = await cacheRepository.retrieveBytes(cacheKey);
+          if (cachedBytes != null &&
+              cachedEntry.createdAt
+                  .add(effectiveMaxAge)
+                  .isAfter(DateTime.now())) {
+            final loadTime = DateTime.now().difference(startTime);
+            return BytesResult.success(cachedBytes,
+                isFromCache: true, loadTime: loadTime);
           }
         }
       }
@@ -75,7 +85,11 @@ class GetBytesUseCase {
       final isConnected = await networkInfo.isConnected;
       if (!isConnected && config.enableOfflineMode) {
         // Try to serve stale data if offline
-        final cachedBytes = await cacheRepository.retrieveBytes(cacheKey);
+        final cachedEntry =
+            await _retrieveSafeEntry(cacheKey, headers, effectiveMaxAge);
+        final cachedBytes = cachedEntry == null
+            ? null
+            : await cacheRepository.retrieveBytes(cacheKey);
         if (cachedBytes != null) {
           final loadTime = DateTime.now().difference(startTime);
           return BytesResult.success(cachedBytes,
@@ -89,8 +103,7 @@ class GetBytesUseCase {
 
       // Cache the result
       await cacheRepository.storeBytes(cacheKey, data,
-          maxAge: maxAge ?? config.maxAge,
-          headers: headers,
+          maxAge: effectiveMaxAge + config.stalePeriod,
           contentType: _inferContentType(url));
 
       final loadTime = DateTime.now().difference(startTime);
@@ -98,7 +111,11 @@ class GetBytesUseCase {
     } catch (e) {
       // Try to serve stale data on error
       if (config.enableOfflineMode) {
-        final cachedBytes = await cacheRepository.retrieveBytes(cacheKey);
+        final cachedEntry =
+            await _retrieveSafeEntry(cacheKey, headers, effectiveMaxAge);
+        final cachedBytes = cachedEntry == null
+            ? null
+            : await cacheRepository.retrieveBytes(cacheKey);
         if (cachedBytes != null) {
           final loadTime = DateTime.now().difference(startTime);
           return BytesResult.success(cachedBytes,
@@ -111,8 +128,23 @@ class GetBytesUseCase {
     }
   }
 
-  String _generateCacheKey(String url, Map<String, String>? headers) {
-    return 'bytes_$url';
+  Future<CacheEntry?> _retrieveSafeEntry(String cacheKey,
+      Map<String, String>? requestHeaders, Duration effectiveMaxAge) async {
+    final entry = await cacheRepository.retrieve(cacheKey);
+    if ((requestHeaders == null || requestHeaders.isEmpty) &&
+        entry?.headers?.isNotEmpty == true) {
+      // Earlier versions used this URL-only key for authenticated responses.
+      await cacheRepository.remove(cacheKey);
+      return null;
+    }
+    if (entry != null &&
+        !entry.createdAt
+            .add(effectiveMaxAge + config.stalePeriod)
+            .isAfter(DateTime.now())) {
+      await cacheRepository.remove(cacheKey);
+      return null;
+    }
+    return entry;
   }
 
   String _inferContentType(String url) {

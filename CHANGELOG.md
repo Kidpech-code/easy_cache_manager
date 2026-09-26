@@ -1,3 +1,32 @@
+## 0.2.1 - 2026-09-26
+
+### Security
+- Separate `getJson` and `getBytes` cache entries by all request headers.
+  Header values are hashed in cache keys and no longer saved as entry metadata.
+- Hash header values in `CacheUtils.generateCacheKey` and normalize header
+  names; keys generated with headers change after upgrading.
+- Discard legacy URL-only entries containing request headers when those URLs
+  are requested, so cached responses from another account are not reused.
+- Authenticated requests will have one cache miss after upgrading. Cached
+  response bodies remain unencrypted by default; applications should clear
+  cache data on sign-out or account changes.
+
+### Fixed
+- Apply `maxAge` to manual JSON and binary saves. HTTP responses remain fresh
+  for `maxAge` and available for one additional `stalePeriod` when offline or
+  on request failure.
+- Enforce the retention limit on legacy HTTP entries without an expiration.
+- Wait for Hive initialization before completing `CacheManager` operations,
+  preventing silent data loss when an operation starts immediately.
+- Share Hive boxes safely across multiple storage instances; closing one
+  instance no longer closes boxes still used by another. Newly initialized
+  instances reopen boxes if Hive was closed externally.
+- Report failed JSON and binary writes instead of silently returning success.
+
+### Documentation
+- Replace outdated README and migration examples with concise, current API
+  guidance and document the cache-key and expiration changes.
+
 ## 0.2.0 - 2026-09-14
 
 ### Breaking changes
