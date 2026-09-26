@@ -3,6 +3,19 @@ import 'package:crypto/crypto.dart';
 
 /// Utility functions for caching operations
 class CacheUtils {
+  /// Cache key for an HTTP response, including every request header.
+  ///
+  /// Keep the historical URL-only key for requests without headers. Requests
+  /// with headers use a digest so credentials are never written into Hive keys.
+  static String generateRequestCacheKey(
+      String prefix, String url, Map<String, String>? headers) {
+    if (headers == null || headers.isEmpty) return '${prefix}_$url';
+
+    final digest = sha256
+        .convert(utf8.encode(jsonEncode([url, _normalizedHeaders(headers)])));
+    return '${prefix}_$digest';
+  }
+
   /// Generate a cache key from URL and optional parameters
   static String generateCacheKey(String url,
       {Map<String, String>? headers,
@@ -25,19 +38,11 @@ class CacheUtils {
       }
     }
 
-    // Add relevant headers to key
-    if (headers != null) {
-      final relevantHeaders = [
-        'authorization',
-        'user-agent',
-        'accept-language'
-      ];
-      for (final headerName in relevantHeaders) {
-        final value = headers[headerName] ?? headers[headerName.toLowerCase()];
-        if (value != null) {
-          buffer.write('_$headerName=$value');
-        }
-      }
+    // Include all request headers without placing their values in the key.
+    if (headers != null && headers.isNotEmpty) {
+      final digest =
+          sha256.convert(utf8.encode(jsonEncode(_normalizedHeaders(headers))));
+      buffer.write('_headers=$digest');
     }
 
     // Generate SHA-256 hash for long keys
@@ -49,6 +54,16 @@ class CacheUtils {
     }
 
     return keyString;
+  }
+
+  static List<List<String>> _normalizedHeaders(Map<String, String> headers) {
+    return headers.entries
+        .map((entry) => [entry.key.toLowerCase(), entry.value])
+        .toList()
+      ..sort((a, b) {
+        final byName = a[0].compareTo(b[0]);
+        return byName != 0 ? byName : a[1].compareTo(b[1]);
+      });
   }
 
   /// Calculate estimated size of data in bytes

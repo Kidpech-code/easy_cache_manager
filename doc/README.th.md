@@ -159,12 +159,12 @@ final cacheManager = CacheManager(
 ## Eviction Policies & Expiry
 
 ### 6. TTL/Expiration per key (หมดอายุแต่ละ key)
-**เหมาะกับ:** ข้อมูลแต่ละประเภทมีอายุไม่เท่ากัน เช่น token 1 ชม. profile 1 วัน
+**เหมาะกับ:** ข้อมูลทั่วไปแต่ละประเภทมีอายุไม่เท่ากัน เช่น draft 1 ชม. catalog 1 วัน
 ```dart
-await cacheManager.save('token', token, maxAge: Duration(hours: 1));
-await cacheManager.save('profile', profile, maxAge: Duration(days: 1));
+await cacheManager.save('draft', draftJson, maxAge: Duration(hours: 1));
+await cacheManager.save('catalog', catalogJson, maxAge: Duration(days: 1));
 ```
-ผลลัพธ์: token จะหมดอายุเร็วกว่า profile และถูกลบอัตโนมัติ
+ผลลัพธ์: draft จะหมดอายุเร็วกว่า catalog โดยไม่ควรใช้ cache นี้เก็บ secret เพราะข้อมูลไม่ได้เข้ารหัสโดยค่าเริ่มต้น
 
 ---
 
@@ -760,4 +760,3 @@ flutter test integration_test/
 **สร้างด้วย ❤️ สำหรับชุมชน Flutter**
 
 หากแพ็กเกจนี้ช่วยคุณได้ กรุณาให้ ⭐ บน [pub.dev](https://pub.dev/packages/easy_cache_manager) และ [GitHub](https://github.com/kidpech/easy_cache_manager)!
-
